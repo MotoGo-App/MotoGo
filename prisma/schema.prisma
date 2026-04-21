@@ -1,0 +1,283 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CLIENT
+  DRIVER
+  ADMIN
+}
+
+enum RideStatus {
+  REQUESTED
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id                    String      @id @default(cuid())
+  email                 String      @unique
+  password              String?
+  name                  String
+  role                  UserRole    @default(CLIENT)
+  profileImage          String?
+  phone                 String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  // Relationships
+  driverProfile         Driver?
+  adminProfile          Admin?
+  clientRides           Ride[]      @relation("ClientRides")
+  driverRides           Ride[]      @relation("DriverRides")
+  ratingsGiven          Rating[]    @relation("RatingsGiven")
+  ratingsReceived       Rating[]    @relation("RatingsReceived")
+  payments              Payment[]
+  accounts              Account[]
+  sessions              Session[]
+  passwordResetTokens   PasswordResetToken[]
+  messagesSent          Message[]   @relation("MessagesSent")
+
+  @@index([email])
+  @@index([role])
+}
+
+model Driver {
+  id                    String      @id @default(cuid())
+  userId                String      @unique
+  licenseNumber         String      @unique
+  vehicleModel          String
+  vehiclePlate          String      @unique
+  averageRating         Float       @default(0)
+  totalRides            Int         @default(0)
+  status                String      @default("online") // "online", "offline", "busy"
+  currentBalance        Float       @default(0)
+  
+  // Profile information
+  age                   Int?
+  drivingExperienceYears Int?
+  mototaxiNumber        String?
+  bio                   String?     @db.Text
+  profilePhotoUrl       String?
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  // Relationships
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription          Subscription?
+  location              DriverLocation?
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Admin {
+  id                    String      @id @default(cuid())
+  userId                String      @unique
+  createdAt             DateTime    @default(now())
+
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Subscription {
+  id                    String      @id @default(cuid())
+  driverId              String      @unique
+  status                SubscriptionStatus @default(ACTIVE)
+  monthlyFee            Float       @default(100.0)
+  currency              String      @default("MXN")
+  stripeSubscriptionId  String?     @unique
+  currentPeriodStart    DateTime?
+  currentPeriodEnd      DateTime?
+  nextPaymentDate       DateTime?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  // Relationships
+  driver                Driver      @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@index([driverId])
+  @@index([status])
+}
+
+model Ride {
+  id                    String      @id @default(cuid())
+  clientId              String
+  driverId              String?
+  originLatitude        Float?
+  originLongitude       Float?
+  originAddress         String
+  destinationLatitude   Float?
+  destinationLongitude  Float?
+  destinationAddress    String
+  status                RideStatus  @default(REQUESTED)
+  fare                  Float?
+  estimatedDuration     Int?        // in minutes
+  actualDuration        Int?        // in minutes
+  startTime             DateTime?
+  completionTime        DateTime?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  // Relationships
+  client                User        @relation("ClientRides", fields: [clientId], references: [id], onDelete: Cascade)
+  driver                User?       @relation("DriverRides", fields: [driverId], references: [id], onDelete: SetNull)
+  payment               Payment?
+  ratings               Rating[]
+  messages              Message[]
+
+  @@index([clientId])
+  @@index([driverId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Rating {
+  id                    String      @id @default(cuid())
+  rideId                String
+  fromUserId            String
+  toUserId              String
+  stars                 Int         // 1-5
+  comment               String?
+  isClientRating        Boolean     // true if client rated driver, false if driver rated client
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  // Relationships
+  ride                  Ride        @relation(fields: [rideId], references: [id], onDelete: Cascade)
+  fromUser              User        @relation("RatingsGiven", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser                User        @relation("RatingsReceived", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  @@unique([rideId, isClientRating])
+  @@index([rideId])
+  @@index([fromUserId])
+  @@index([toUserId])
+}
+
+model Payment {
+  id                    String      @id @default(cuid())
+  userId                String
+  rideId                String?     @unique
+  amount                Float
+  currency              String      @default("MXN")
+  type                  String      // "RIDE_PAYMENT" or "SUBSCRIPTION_PAYMENT"
+  status                PaymentStatus @default(PENDING)
+  stripePaymentIntentId String?
+  stripeChargeId        String?
+  metadata              String?     // JSON string for additional info
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  // Relationships
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ride                  Ride?       @relation(fields: [rideId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([rideId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model DriverLocation {
+  id                    String      @id @default(cuid())
+  driverId              String      @unique
+  latitude              Float
+  longitude             Float
+  accuracy              Float?
+  speed                 Float?
+  heading               Float?
+  updatedAt             DateTime    @updatedAt
+
+  // Relationships
+  driver                Driver      @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@index([driverId])
+}
+
+model Message {
+  id                    String      @id @default(cuid())
+  rideId                String
+  senderId              String
+  content               String      @db.Text
+  createdAt             DateTime    @default(now())
+
+  // Relationships
+  ride                  Ride        @relation(fields: [rideId], references: [id], onDelete: Cascade)
+  sender                User        @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([rideId, createdAt])
+  @@index([senderId])
+}
+
+model PasswordResetToken {
+  id                    String      @id @default(cuid())
+  token                 String      @unique
+  userId                String
+  expiresAt             DateTime
+  used                  Boolean     @default(false)
+  createdAt             DateTime    @default(now())
+
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+// NextAuth Models
+model Account {
+  id                    String      @id @default(cuid())
+  userId                String
+  type                  String
+  provider              String
+  providerAccountId     String
+  refresh_token         String?     @db.Text
+  access_token          String?     @db.Text
+  expires_at            Int?
+  token_type            String?
+  scope                 String?
+  id_token              String?     @db.Text
+  session_state         String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id                    String      @id @default(cuid())
+  sessionToken          String      @unique
+  userId                String
+  expires               DateTime
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
