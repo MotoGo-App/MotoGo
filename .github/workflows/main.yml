@@ -28,7 +28,7 @@ jobs:
         run: yarn prisma generate 
 
       - name: 🔍 Chequeo de Tipos (TypeScript)
-        run: yarn tsc --noEmit
+        run: yarn type-check
 
       - name: 🧹 Linting (ESLint)
         run: yarn lint
@@ -36,6 +36,6 @@ jobs:
       - name: 🚀 Construir aplicación (Build)
         run: yarn build
         env:
-          # Next.js a veces requiere la variable de entorno de Prisma para compilar.
-          # Le pasamos una falsa solo para que pase la prueba de construcción.
           DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+          NEXTAUTH_SECRET: "dummy-secret-for-ci-build-only"
+          NEXTAUTH_URL: "http://localhost:3000"
