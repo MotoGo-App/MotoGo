@@ -1,3 +1,10 @@
 {
+<<<<<<< setup-ci-pipeline
   "extends": "next/core-web-vitals"
+=======
+  "extends": [
+    "next/core-web-vitals",
+    "next/typescript"
+  ]
+>>>>>>> main
 }
