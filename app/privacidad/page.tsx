@@ -50,7 +50,7 @@ export default function PrivacyPolicyPage() {
         {/* Introduction */}
         <div className="glass-card rounded-2xl p-6 mb-6">
           <p className="text-foreground leading-relaxed">
-            En <strong>MotoGo</strong> ("nosotros", "nuestro" o "la Plataforma") nos comprometemos a proteger la privacidad y los datos personales de nuestros usuarios. El presente Aviso de Privacidad tiene por objeto informarle sobre el tratamiento que daremos a sus datos personales, en cumplimiento con la <strong>Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP)</strong> de México, su Reglamento y demás disposiciones aplicables.
+            En <strong>MotoGo</strong> (&quot;nosotros&quot;, &quot;nuestro&quot; o &quot;la Plataforma&quot;) nos comprometemos a proteger la privacidad y los datos personales de nuestros usuarios. El presente Aviso de Privacidad tiene por objeto informarle sobre el tratamiento que daremos a sus datos personales, en cumplimiento con la <strong>Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP)</strong> de México, su Reglamento y demás disposiciones aplicables.
           </p>
         </div>
 
