@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { z } from "zod";
-import { validateBody } from "./http";
+import { validateBody } from "@/lib/http";
 
 const testSchema = z.object({
     name: z.string().min(1),
