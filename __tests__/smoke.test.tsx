@@ -4,7 +4,6 @@ import Home from '../app/page';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-// Mocks de NextAuth y Router
 vi.mock('next-auth/react');
 vi.mock('next/navigation');
 

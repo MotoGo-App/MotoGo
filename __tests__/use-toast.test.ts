@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
-import { useToast } from '../hooks/use-toast' // Verifica que la ruta sea correcta
+import { useToast } from '../hooks/use-toast'
 
 describe('useToast Hook', () => {
   it('debería inicializarse con una lista vacía de toasts', () => {
@@ -32,8 +32,6 @@ describe('useToast Hook', () => {
       result.current.toast({ title: 'Toast 2' })
     })
 
-    // Gracias al .slice(0, TOAST_LIMIT) en tu reducer, 
-    // la longitud debe seguir siendo 1
     expect(result.current.toasts.length).toBe(1)
     expect(result.current.toasts[0].title).toBe('Toast 2')
   })

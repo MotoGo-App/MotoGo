@@ -15,7 +15,7 @@ describe('Database withRetry Wrapper', () => {
       .mockRejectedValueOnce(new Error('ECONNRESET'))
       .mockResolvedValueOnce('recovered');
 
-    const result = await withRetry(operation, 2, 10); // delay corto para el test
+    const result = await withRetry(operation, 2, 10); 
     
     expect(result).toBe('recovered');
     expect(operation).toHaveBeenCalledTimes(2);
