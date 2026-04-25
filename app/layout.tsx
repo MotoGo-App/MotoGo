@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
+import Script from 'next/script';
 import './globals.css';
 import { Providers } from './providers';
 
@@ -39,13 +40,12 @@ export default async function RootLayout({
 
   return (
     <html lang="es" suppressHydrationWarning className={`${inter.variable} ${plusJakarta.variable}`}>
-      <head>
-        <script src="https://apps.abacus.ai/chatllm/appllm-lib.js"></script>
-      </head>
+      <head />
       <body className="bg-background text-foreground font-sans antialiased">
         <Providers session={session}>
           {children}
         </Providers>
+        <Script src="https://apps.abacus.ai/chatllm/appllm-lib.js" strategy="lazyOnload" />
       </body>
     </html>
   );
