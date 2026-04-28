@@ -1,68 +1,88 @@
-import {acceptRideSchema} from "@/app/api/drivers/accept-ride/schema.ts";
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { Prisma, RideStatus } from '@prisma/client';
+import { authOptions } from '@/lib/auth';
+import { prisma, withRetry } from '@/lib/db';
+import { validateBody } from '@/lib/http';
+import { acceptRideSchema } from './schema';
 
 export const dynamic = 'force-dynamic';
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma, withRetry } from '@/lib/db';
-import {validateBody} from "@/lib/http.ts";
-
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
+  const driverId = session?.user?.id;
 
-  if (!session?.user?.id) {
+  if (!driverId) {
     return NextResponse.json({ message: 'No autenticado' }, { status: 401 });
   }
 
+  const validation = await validateBody(request, acceptRideSchema);
+
+  if (!validation.ok) {
+    return validation.response;
+  }
+
+  const { rideId } = validation.data;
+
   try {
-    const validation = await validateBody(request, acceptRideSchema);
+    const accepted = await prisma.$transaction(async (tx) => {
+      const driver = await withRetry(() =>
+        tx.driver.findUnique({ where: { userId: driverId } })
+      );
 
-    if (!validation.ok) {
-      return validation.response
-    }
+      if (!driver || driver.status !== 'online') {
+        return { ok: false as const, reason: 'DRIVER_OFFLINE' as const };
+      }
 
-    const { rideId } = validation.data;
+      const ride = await tx.ride.findUnique({ where: { id: rideId } });
 
-    // Verificar que el conductor está online
-    const driver = await withRetry(() =>
-      prisma.driver.findUnique({
-        where: { userId: session.user!.id },
-      })
-    );
-    if (!driver || driver.status !== 'online') {
+      if (!ride) {
+        return { ok: false as const, reason: 'NOT_FOUND' as const };
+      }
+
+      if (ride.status !== RideStatus.REQUESTED) {
+        return { ok: false as const, reason: 'ALREADY_TAKEN' as const };
+      }
+
+      try {
+        const updated = await tx.ride.update({
+          where: { id: rideId, status: RideStatus.REQUESTED },
+          data: { driverId, status: RideStatus.ACCEPTED },
+          include: { client: true, driver: true },
+        });
+
+        return { ok: true as const, ride: updated };
+      } catch (e) {
+        if (
+          e instanceof Prisma.PrismaClientKnownRequestError &&
+          e.code === 'P2025'
+        ) {
+          return { ok: false as const, reason: 'ALREADY_TAKEN' as const };
+        }
+        throw e;
+      }
+    });
+
+    if (!accepted.ok) {
+      if (accepted.reason === 'NOT_FOUND') {
+        return NextResponse.json(
+          { message: 'Viaje no encontrado' },
+          { status: 404 }
+        );
+      }
+      if (accepted.reason === 'DRIVER_OFFLINE') {
+        return NextResponse.json(
+          { message: 'Debes estar en línea para aceptar viajes' },
+          { status: 403 }
+        );
+      }
       return NextResponse.json(
-        { message: 'Debes estar en línea para aceptar viajes' },
-        { status: 403 }
+        { message: 'Este viaje ya fue aceptado' },
+        { status: 409 }
       );
     }
 
-    // Verify ride exists and is still REQUESTED
-    const existingRide = await withRetry(() =>
-      prisma.ride.findUnique({ where: { id: rideId } })
-    );
-    if (!existingRide || existingRide.status !== 'REQUESTED') {
-      return NextResponse.json(
-        { message: 'Este viaje ya no está disponible' },
-        { status: 400 }
-      );
-    }
-
-    const ride = await withRetry(() =>
-      prisma.ride.update({
-        where: { id: rideId },
-        data: {
-          driverId: session.user!.id,
-          status: 'ACCEPTED',
-        },
-        include: {
-          client: true,
-          driver: true,
-        },
-      })
-    );
-
-    return NextResponse.json(ride);
+    return NextResponse.json(accepted.ride, { status: 200 });
   } catch (error) {
     console.error('Error accepting ride:', error);
     return NextResponse.json(
