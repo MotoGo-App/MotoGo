@@ -1,9 +1,12 @@
+import {acceptRideSchema} from "@/app/api/drivers/accept-ride/schema.ts";
+
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
+import {validateBody} from "@/lib/http.ts";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -13,7 +16,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { rideId } = await request.json();
+    const validation = await validateBody(request, acceptRideSchema);
+
+    if (!validation.ok) {
+      return validation.response
+    }
+
+    const { rideId } = validation.data;
 
     // Verificar que el conductor está online
     const driver = await withRetry(() =>
