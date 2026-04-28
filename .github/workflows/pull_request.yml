@@ -1,0 +1,39 @@
+name: CI Pipeline
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-check:
+    name: Lint, Type Check & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Clonar el repositorio
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.13.0' # Una versión moderna y estable
+          cache: 'yarn'      # Hace que las siguientes veces sea más rápido
+
+      - name: 📦 Instalar dependencias
+        run: yarn install --frozen-lockfile
+
+      - name: 🗄️ Generar Prisma Client
+        #Si no generamos Prisma aquí, el build fallará 
+        run: yarn prisma generate 
+
+      - name: 🔍 Chequeo de Tipos (TypeScript)
+        run: yarn type-check
+
+      - name: 🧹 Linting (ESLint)
+        run: yarn lint
+
+      - name: 🚀 Construir aplicación (Build)
+        run: yarn build
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+          NEXTAUTH_SECRET: "dummy-secret-for-ci-build-only"
+          NEXTAUTH_URL: "http://localhost:3000"
