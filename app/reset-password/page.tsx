@@ -66,10 +66,14 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <AuthLayout title="Enlace inválido" description="No se encontró un token de recuperación válido">
+      <AuthLayout
+        title="Enlace inválido"
+        description="No se encontró un token de recuperación válido"
+      >
         <div className="space-y-4 text-center">
           <p className="text-sm text-muted-foreground">
-            El enlace que usaste es inválido o ha expirado. Solicita un nuevo enlace de recuperación.
+            El enlace que usaste es inválido o ha expirado. Solicita un nuevo enlace de
+            recuperación.
           </p>
           <Link href="/forgot-password">
             <Button className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25">
@@ -92,7 +96,10 @@ function ResetPasswordForm() {
 
   if (success) {
     return (
-      <AuthLayout title="¡Contraseña actualizada!" description="Ya puedes iniciar sesión con tu nueva contraseña">
+      <AuthLayout
+        title="¡Contraseña actualizada!"
+        description="Ya puedes iniciar sesión con tu nueva contraseña"
+      >
         <div className="space-y-4 text-center">
           <div className="mx-auto w-16 h-16 rounded-full bg-green-500/15 flex items-center justify-center mb-4">
             <CheckCircle className="w-8 h-8 text-green-500" />
@@ -115,7 +122,9 @@ function ResetPasswordForm() {
     <AuthLayout title="Nueva contraseña" description="Ingresa tu nueva contraseña">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-muted-foreground text-sm">Nueva contraseña</Label>
+          <Label htmlFor="password" className="text-muted-foreground text-sm">
+            Nueva contraseña
+          </Label>
           <div className="relative">
             <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
             <Input
@@ -132,7 +141,9 @@ function ResetPasswordForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword" className="text-muted-foreground text-sm">Confirmar contraseña</Label>
+          <Label htmlFor="confirmPassword" className="text-muted-foreground text-sm">
+            Confirmar contraseña
+          </Label>
           <div className="relative">
             <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
             <Input
@@ -179,13 +190,15 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={
-      <AuthLayout title="Cargando..." description="">
-        <div className="flex items-center justify-center py-8">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        </div>
-      </AuthLayout>
-    }>
+    <Suspense
+      fallback={
+        <AuthLayout title="Cargando..." description="">
+          <div className="flex items-center justify-center py-8">
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
+        </AuthLayout>
+      }
+    >
       <ResetPasswordForm />
     </Suspense>
   );

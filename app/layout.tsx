@@ -31,20 +31,18 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
 
   return (
-    <html lang="es" suppressHydrationWarning className={`${inter.variable} ${plusJakarta.variable}`}>
+    <html
+      lang="es"
+      suppressHydrationWarning
+      className={`${inter.variable} ${plusJakarta.variable}`}
+    >
       <head />
       <body className="bg-background text-foreground font-sans antialiased">
-        <Providers session={session}>
-          {children}
-        </Providers>
+        <Providers session={session}>{children}</Providers>
         <Script src="https://apps.abacus.ai/chatllm/appllm-lib.js" strategy="lazyOnload" />
       </body>
     </html>

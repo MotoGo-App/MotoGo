@@ -7,11 +7,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 
-export default function ClientLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession() || {};
   const router = useRouter();
 
@@ -38,10 +34,10 @@ export default function ClientLayout({
       <header className="absolute top-0 left-0 right-0 z-50 pointer-events-none">
         <div className="flex justify-between items-center p-3">
           <div className="flex items-center glass-card rounded-xl px-3 py-2 pointer-events-auto">
-            <Image 
-              src="/motogo-logo.png" 
-              alt="MotoGo" 
-              width={100} 
+            <Image
+              src="/motogo-logo.png"
+              alt="MotoGo"
+              width={100}
               height={38}
               priority
               className="h-8 w-auto"
@@ -62,9 +58,7 @@ export default function ClientLayout({
           </div>
         </div>
       </header>
-      <main className="h-full w-full">
-        {children}
-      </main>
+      <main className="h-full w-full">{children}</main>
     </div>
   );
 }

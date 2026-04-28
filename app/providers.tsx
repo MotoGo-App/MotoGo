@@ -6,13 +6,7 @@ import { PreventZoom } from '@/components/prevent-zoom';
 import { CoverageNoticeDialog } from '@/components/coverage-notice-dialog';
 import { ReactNode } from 'react';
 
-export function Providers({
-  children,
-  session,
-}: {
-  children: ReactNode;
-  session: any;
-}) {
+export function Providers({ children, session }: { children: ReactNode; session: any }) {
   return (
     <SessionProvider session={session}>
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem>

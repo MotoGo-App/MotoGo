@@ -138,10 +138,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(rides ?? []);
   } catch (error) {
     console.error('Error fetching rides:', error);
-    return NextResponse.json(
-      { message: 'Error al obtener viajes' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al obtener viajes' }, { status: 500 });
   }
 }
 
@@ -197,9 +194,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(ride, { status: 201 });
   } catch (error) {
     console.error('Error creating ride:', error);
-    return NextResponse.json(
-      { message: 'Error al crear el viaje' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al crear el viaje' }, { status: 500 });
   }
 }

@@ -19,7 +19,10 @@ export async function POST(request: NextRequest) {
 
     // Always return success to prevent email enumeration
     if (!user) {
-      return NextResponse.json({ success: true, message: 'Si el correo existe, recibirás un enlace de recuperación.' });
+      return NextResponse.json({
+        success: true,
+        message: 'Si el correo existe, recibirás un enlace de recuperación.',
+      });
     }
 
     // Generate secure token
@@ -96,7 +99,10 @@ export async function POST(request: NextRequest) {
       // Don't fail the request if email fails
     }
 
-    return NextResponse.json({ success: true, message: 'Si el correo existe, recibirás un enlace de recuperación.' });
+    return NextResponse.json({
+      success: true,
+      message: 'Si el correo existe, recibirás un enlace de recuperación.',
+    });
   } catch (error) {
     console.error('Error in forgot-password:', error);
     return NextResponse.json({ message: 'Error al procesar la solicitud' }, { status: 500 });
