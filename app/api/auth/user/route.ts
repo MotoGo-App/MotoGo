@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
           Pragma: 'no-cache',
           Expires: '0',
         },
-      },
+      }
     );
   } catch (error) {
     console.error('Error fetching user:', error);

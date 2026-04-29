@@ -16,9 +16,7 @@ export async function POST(request: NextRequest) {
     const { rideId } = await request.json();
 
     // Verify ride exists, belongs to this driver, and is ACCEPTED
-    const existingRide = await withRetry(() =>
-      prisma.ride.findUnique({ where: { id: rideId } })
-    );
+    const existingRide = await withRetry(() => prisma.ride.findUnique({ where: { id: rideId } }));
 
     if (!existingRide) {
       return NextResponse.json({ message: 'Viaje no encontrado' }, { status: 404 });
@@ -52,9 +50,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(ride);
   } catch (error) {
     console.error('Error starting ride:', error);
-    return NextResponse.json(
-      { message: 'Error al iniciar el viaje' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al iniciar el viaje' }, { status: 500 });
   }
 }

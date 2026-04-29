@@ -25,9 +25,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'clientId requerido' }, { status: 400 });
     }
 
-    const client = await withRetry(() =>
-      prisma.user.findUnique({ where: { id: clientId } })
-    );
+    const client = await withRetry(() => prisma.user.findUnique({ where: { id: clientId } }));
 
     if (!client || client.role !== 'CLIENT') {
       return NextResponse.json({ error: 'Cliente no encontrado' }, { status: 404 });
@@ -35,26 +33,19 @@ export async function POST(request: NextRequest) {
 
     // Delete in the correct order to respect foreign keys
     // 1. Delete messages sent by this client
-    await withRetry(() =>
-      prisma.message.deleteMany({ where: { senderId: clientId } })
-    );
+    await withRetry(() => prisma.message.deleteMany({ where: { senderId: clientId } }));
 
     // 2. Delete ratings related to this client
     await withRetry(() =>
       prisma.rating.deleteMany({
         where: {
-          OR: [
-            { toUserId: clientId },
-            { fromUserId: clientId },
-          ],
+          OR: [{ toUserId: clientId }, { fromUserId: clientId }],
         },
       })
     );
 
     // 3. Delete payments by this client
-    await withRetry(() =>
-      prisma.payment.deleteMany({ where: { userId: clientId } })
-    );
+    await withRetry(() => prisma.payment.deleteMany({ where: { userId: clientId } }));
 
     // 4. Delete messages from rides of this client (sent by drivers)
     const clientRides = await withRetry(() =>
@@ -69,27 +60,17 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Delete rides of this client
-    await withRetry(() =>
-      prisma.ride.deleteMany({ where: { clientId } })
-    );
+    await withRetry(() => prisma.ride.deleteMany({ where: { clientId } }));
 
     // 6. Delete NextAuth sessions and accounts
-    await withRetry(() =>
-      prisma.session.deleteMany({ where: { userId: clientId } })
-    );
-    await withRetry(() =>
-      prisma.account.deleteMany({ where: { userId: clientId } })
-    );
+    await withRetry(() => prisma.session.deleteMany({ where: { userId: clientId } }));
+    await withRetry(() => prisma.account.deleteMany({ where: { userId: clientId } }));
 
     // 7. Delete password reset tokens
-    await withRetry(() =>
-      prisma.passwordResetToken.deleteMany({ where: { userId: clientId } })
-    );
+    await withRetry(() => prisma.passwordResetToken.deleteMany({ where: { userId: clientId } }));
 
     // 8. Delete the user
-    await withRetry(() =>
-      prisma.user.delete({ where: { id: clientId } })
-    );
+    await withRetry(() => prisma.user.delete({ where: { id: clientId } }));
 
     return NextResponse.json({
       message: 'Cliente eliminado exitosamente',
@@ -97,9 +78,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error al eliminar cliente:', error);
-    return NextResponse.json(
-      { error: 'Error al eliminar cliente' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error al eliminar cliente' }, { status: 500 });
   }
 }

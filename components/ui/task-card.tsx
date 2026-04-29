@@ -1,20 +1,20 @@
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from './card'
-import { Badge } from './badge'
-import { Checkbox } from './checkbox'
-import { Button } from './button'
-import { Pencil, Trash2 } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from './card';
+import { Badge } from './badge';
+import { Checkbox } from './checkbox';
+import { Button } from './button';
+import { Pencil, Trash2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface TaskCardProps {
-  id: string
-  title: string
-  description?: string
-  category: string
-  completed: boolean
-  onComplete: (id: string, completed: boolean) => void
-  onDelete: (id: string) => void
-  onEdit: (id: string) => void
+  id: string;
+  title: string;
+  description?: string;
+  category: string;
+  completed: boolean;
+  onComplete: (id: string, completed: boolean) => void;
+  onDelete: (id: string) => void;
+  onEdit: (id: string) => void;
 }
 
 export function TaskCard({
@@ -41,9 +41,7 @@ export function TaskCard({
               checked={completed}
               onCheckedChange={(checked) => onComplete(id, checked as boolean)}
             />
-            <CardTitle className={`text-lg ${completed ? 'line-through' : ''}`}>
-              {title}
-            </CardTitle>
+            <CardTitle className={`text-lg ${completed ? 'line-through' : ''}`}>{title}</CardTitle>
           </div>
           <div className="flex space-x-2">
             <Button variant="ghost" size="icon" onClick={() => onEdit(id)}>
@@ -62,5 +60,5 @@ export function TaskCard({
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }

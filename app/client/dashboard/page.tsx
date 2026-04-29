@@ -6,7 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { MapPin, Plus, History, X, Clock, Navigation, Star, ChevronUp, Crosshair } from 'lucide-react';
+import {
+  MapPin,
+  Plus,
+  History,
+  X,
+  Clock,
+  Navigation,
+  Star,
+  ChevronUp,
+  Crosshair,
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { RideMap } from '@/components/map';
 import { RatingModal } from '@/components/rating-modal';
@@ -158,8 +168,9 @@ export default function ClientDashboard() {
       setRides(data);
 
       // Verificar si hay un viaje activo
-      const active = data.find((r: Ride) =>
-        r.status === 'ACCEPTED' || r.status === 'IN_PROGRESS' || r.status === 'REQUESTED'
+      const active = data.find(
+        (r: Ride) =>
+          r.status === 'ACCEPTED' || r.status === 'IN_PROGRESS' || r.status === 'REQUESTED'
       );
       if (active) {
         setActiveRide(active);
@@ -247,7 +258,11 @@ export default function ClientDashboard() {
           addr.neighbourhood || addr.suburb || '',
           addr.city || addr.town || addr.village || '',
         ].filter(Boolean);
-        return parts.join(', ') || data.display_name?.split(',').slice(0, 3).join(',') || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+        return (
+          parts.join(', ') ||
+          data.display_name?.split(',').slice(0, 3).join(',') ||
+          `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+        );
       }
     } catch (e) {
       console.error('Error en reverse geocoding:', e);
@@ -377,14 +392,22 @@ export default function ClientDashboard() {
   };
 
   const handleNotification = (message: string) => {
-    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+    if (
+      typeof window !== 'undefined' &&
+      'Notification' in window &&
+      Notification.permission === 'granted'
+    ) {
       new Notification('MotoGo', { body: message });
     }
     toast.info(message);
   };
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+    if (
+      typeof window !== 'undefined' &&
+      'Notification' in window &&
+      Notification.permission === 'default'
+    ) {
       Notification.requestPermission();
     }
   }, []);
@@ -418,7 +441,8 @@ export default function ClientDashboard() {
         <div className="glass-card rounded-xl px-3 py-2 flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
           <span className="text-sm font-medium text-foreground">
-            {nearbyDrivers.length} conductor{nearbyDrivers.length !== 1 ? 'es' : ''} disponible{nearbyDrivers.length !== 1 ? 's' : ''}
+            {nearbyDrivers.length} conductor{nearbyDrivers.length !== 1 ? 'es' : ''} disponible
+            {nearbyDrivers.length !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
@@ -429,9 +453,13 @@ export default function ClientDashboard() {
           <div className="bg-primary text-primary-foreground rounded-xl shadow-lg px-3 py-2 text-center">
             <p className="text-xs opacity-80">Viaje activo</p>
             <p className="text-sm font-bold">
-              {activeRide.status === 'REQUESTED' ? 'Buscando...' :
-               activeRide.status === 'ACCEPTED' ? 'En camino' :
-               activeRide.status === 'IN_PROGRESS' ? 'En viaje' : activeRide.status}
+              {activeRide.status === 'REQUESTED'
+                ? 'Buscando...'
+                : activeRide.status === 'ACCEPTED'
+                  ? 'En camino'
+                  : activeRide.status === 'IN_PROGRESS'
+                    ? 'En viaje'
+                    : activeRide.status}
             </p>
           </div>
         </div>
@@ -467,7 +495,9 @@ export default function ClientDashboard() {
                     : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                 }`}
               >
-                <span className="flex items-center gap-1"><Plus className="w-3 h-3" /> Solicitar</span>
+                <span className="flex items-center gap-1">
+                  <Plus className="w-3 h-3" /> Solicitar
+                </span>
               </button>
               {activeRide && (
                 <button
@@ -478,7 +508,9 @@ export default function ClientDashboard() {
                       : 'bg-green-100 text-green-700 hover:bg-green-200'
                   }`}
                 >
-                  <span className="flex items-center gap-1"><Navigation className="w-3 h-3" /> Viaje</span>
+                  <span className="flex items-center gap-1">
+                    <Navigation className="w-3 h-3" /> Viaje
+                  </span>
                 </button>
               )}
               <button
@@ -489,7 +521,9 @@ export default function ClientDashboard() {
                     : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                 }`}
               >
-                <span className="flex items-center gap-1"><History className="w-3 h-3" /> Historial</span>
+                <span className="flex items-center gap-1">
+                  <History className="w-3 h-3" /> Historial
+                </span>
               </button>
             </div>
             <button
@@ -581,7 +615,9 @@ export default function ClientDashboard() {
                           <p className="text-xs font-medium text-foreground">{driver.user.name}</p>
                           <div className="flex items-center gap-1">
                             <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                            <span className="text-xs text-muted-foreground">{driver.averageRating.toFixed(1)}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {driver.averageRating.toFixed(1)}
+                            </span>
                           </div>
                         </div>
                       ))}
@@ -598,14 +634,20 @@ export default function ClientDashboard() {
                   <CardContent className="p-4">
                     {/* Estado del viaje */}
                     <div className="flex items-center justify-between mb-3">
-                      <Badge className={`${
-                        activeRide.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
-                        activeRide.status === 'ACCEPTED' ? 'bg-blue-100 text-blue-800' :
-                        'bg-green-100 text-green-800'
-                      }`}>
-                        {activeRide.status === 'REQUESTED' ? '🔍 Buscando conductor...' :
-                         activeRide.status === 'ACCEPTED' ? '🏍️ Conductor en camino' :
-                         '🚗 En viaje'}
+                      <Badge
+                        className={`${
+                          activeRide.status === 'REQUESTED'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : activeRide.status === 'ACCEPTED'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-green-100 text-green-800'
+                        }`}
+                      >
+                        {activeRide.status === 'REQUESTED'
+                          ? '🔍 Buscando conductor...'
+                          : activeRide.status === 'ACCEPTED'
+                            ? '🏍️ Conductor en camino'
+                            : '🚗 En viaje'}
                       </Badge>
                     </div>
 
@@ -645,24 +687,31 @@ export default function ClientDashboard() {
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-sm text-foreground truncate">{activeRide.driver.name}</p>
+                            <p className="font-semibold text-sm text-foreground truncate">
+                              {activeRide.driver.name}
+                            </p>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                               {activeRide.driver.driverProfile?.vehicleModel && (
                                 <span>🏍️ {activeRide.driver.driverProfile.vehicleModel}</span>
                               )}
-                              {activeRide.driver.driverProfile?.vehiclePlate && 
-                               !activeRide.driver.driverProfile.vehiclePlate.startsWith('TEMP-') && (
-                                <span>• {activeRide.driver.driverProfile.vehiclePlate}</span>
-                              )}
+                              {activeRide.driver.driverProfile?.vehiclePlate &&
+                                !activeRide.driver.driverProfile.vehiclePlate.startsWith(
+                                  'TEMP-'
+                                ) && <span>• {activeRide.driver.driverProfile.vehiclePlate}</span>}
                             </div>
                           </div>
                           <div className="text-right flex-shrink-0">
                             <div className="flex items-center gap-0.5">
                               <span className="text-yellow-500">⭐</span>
-                              <span className="text-sm font-medium">{activeRide.driver.driverProfile?.averageRating?.toFixed(1) || '0.0'}</span>
+                              <span className="text-sm font-medium">
+                                {activeRide.driver.driverProfile?.averageRating?.toFixed(1) ||
+                                  '0.0'}
+                              </span>
                             </div>
                             {activeRide.driver.driverProfile?.mototaxiNumber && (
-                              <p className="text-xs text-muted-foreground">#{activeRide.driver.driverProfile.mototaxiNumber}</p>
+                              <p className="text-xs text-muted-foreground">
+                                #{activeRide.driver.driverProfile.mototaxiNumber}
+                              </p>
                             )}
                           </div>
                         </div>
@@ -677,7 +726,7 @@ export default function ClientDashboard() {
                     )}
 
                     {/* Botón cancelar - si no aceptado, o si ACCEPTED sin conductor real */}
-                    {(activeRide.status === 'REQUESTED' || 
+                    {(activeRide.status === 'REQUESTED' ||
                       (activeRide.status === 'ACCEPTED' && !activeRide.driver)) && (
                       <Button
                         variant="outline"
@@ -708,7 +757,9 @@ export default function ClientDashboard() {
                           </div>
                           <div className="flex-1">
                             <p className="text-sm font-medium">{ride.originAddress}</p>
-                            <p className="text-xs text-muted-foreground">{ride.destinationAddress}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {ride.destinationAddress}
+                            </p>
                           </div>
                           <div className="text-right">
                             <p className="text-xs text-muted-foreground">
@@ -732,10 +783,12 @@ export default function ClientDashboard() {
       )}
 
       {/* Chat - visible durante viajes ACCEPTED o IN_PROGRESS con conductor */}
-      {activeRide && activeRide.driver && session?.user?.id &&
+      {activeRide &&
+        activeRide.driver &&
+        session?.user?.id &&
         (activeRide.status === 'ACCEPTED' || activeRide.status === 'IN_PROGRESS') && (
-        <RideChat rideId={activeRide.id} currentUserId={session.user.id} />
-      )}
+          <RideChat rideId={activeRide.id} currentUserId={session.user.id} />
+        )}
 
       {/* Rating Modal - Aparece cuando se completa un viaje */}
       {rideToRate && (

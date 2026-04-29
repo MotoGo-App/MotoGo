@@ -16,9 +16,7 @@ export async function POST(request: NextRequest) {
     const { rideId } = await request.json();
 
     // Verify ride is IN_PROGRESS before completing
-    const existingRide = await withRetry(() =>
-      prisma.ride.findUnique({ where: { id: rideId } })
-    );
+    const existingRide = await withRetry(() => prisma.ride.findUnique({ where: { id: rideId } }));
 
     if (!existingRide) {
       return NextResponse.json({ message: 'Viaje no encontrado' }, { status: 404 });
@@ -70,9 +68,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(ride);
   } catch (error) {
     console.error('Error completing ride:', error);
-    return NextResponse.json(
-      { message: 'Error al completar el viaje' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al completar el viaje' }, { status: 500 });
   }
 }

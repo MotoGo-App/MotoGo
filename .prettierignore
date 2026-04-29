@@ -1,0 +1,10 @@
+node_modules/
+.next/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+yarn.lock
+package-lock.json
+prisma/migrations/
+public/

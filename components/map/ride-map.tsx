@@ -32,7 +32,7 @@ export function RideMap({
   rideStatus,
   onNotificationNeeded,
   centerTrigger,
-  isDriverView = false
+  isDriverView = false,
 }: RideMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
@@ -47,14 +47,16 @@ export function RideMap({
   // Cargar Leaflet de forma dinámica (solo en cliente)
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
-    import('leaflet').then((leaflet) => {
-      setL(leaflet.default);
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
-      document.head.appendChild(link);
-    }).catch(err => console.error('Error cargando Leaflet:', err));
+
+    import('leaflet')
+      .then((leaflet) => {
+        setL(leaflet.default);
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+        document.head.appendChild(link);
+      })
+      .catch((err) => console.error('Error cargando Leaflet:', err));
   }, []);
 
   // Inicializar mapa cuando Leaflet esté disponible
@@ -62,10 +64,11 @@ export function RideMap({
     if (!L || !containerRef.current || mapInitialized) return;
 
     try {
-      const initialLocation = driverLocation || clientLocation || {
-        latitude: 25.6866,
-        longitude: -100.3161
-      };
+      const initialLocation = driverLocation ||
+        clientLocation || {
+          latitude: 25.6866,
+          longitude: -100.3161,
+        };
 
       const map = L.map(containerRef.current).setView(
         [initialLocation.latitude, initialLocation.longitude],
@@ -74,14 +77,18 @@ export function RideMap({
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        maxZoom: 19
+        maxZoom: 19,
       }).addTo(map);
 
       map.zoomControl.setPosition('bottomright');
 
       // Track user interaction to avoid fighting with auto-pan
-      map.on('dragstart', () => { userInteractedRef.current = true; });
-      map.on('zoomstart', () => { userInteractedRef.current = true; });
+      map.on('dragstart', () => {
+        userInteractedRef.current = true;
+      });
+      map.on('zoomstart', () => {
+        userInteractedRef.current = true;
+      });
 
       mapRef.current = map;
       setMapInitialized(true);
@@ -99,11 +106,9 @@ export function RideMap({
   useEffect(() => {
     if (!mapRef.current || !clientLocation || !centerTrigger) return;
     userInteractedRef.current = false;
-    mapRef.current.setView(
-      [clientLocation.latitude, clientLocation.longitude],
-      16,
-      { animate: true }
-    );
+    mapRef.current.setView([clientLocation.latitude, clientLocation.longitude], 16, {
+      animate: true,
+    });
   }, [centerTrigger, clientLocation]);
 
   // Calcular distancia entre conductor y cliente
@@ -136,19 +141,15 @@ export function RideMap({
       </div>`,
       iconSize: [50, 50],
       iconAnchor: [25, 25],
-      popupAnchor: [0, -25]
+      popupAnchor: [0, -25],
     });
 
     if (mapRef.current.driverMarker) {
-      mapRef.current.driverMarker.setLatLng([
-        driverLocation.latitude,
-        driverLocation.longitude
-      ]);
+      mapRef.current.driverMarker.setLatLng([driverLocation.latitude, driverLocation.longitude]);
     } else {
-      mapRef.current.driverMarker = L.marker(
-        [driverLocation.latitude, driverLocation.longitude],
-        { icon: driverIcon }
-      )
+      mapRef.current.driverMarker = L.marker([driverLocation.latitude, driverLocation.longitude], {
+        icon: driverIcon,
+      })
         .bindPopup(`<div><strong>Conductor</strong></div>`)
         .addTo(mapRef.current);
     }
@@ -157,7 +158,10 @@ export function RideMap({
     // For driver view: gently follow the driver
     // For client view: don't auto-pan (driver marker moves, user watches)
     if (isDriverView && !userInteractedRef.current) {
-      mapRef.current.panTo([driverLocation.latitude, driverLocation.longitude], { animate: true, duration: 1 });
+      mapRef.current.panTo([driverLocation.latitude, driverLocation.longitude], {
+        animate: true,
+        duration: 1,
+      });
     }
   }, [L, driverLocation, isDriverView]);
 
@@ -169,19 +173,15 @@ export function RideMap({
       html: `<div style="background-color: #2563eb; color: white; border: 3px solid white; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">📍</div>`,
       iconSize: [45, 45],
       iconAnchor: [22, 22],
-      popupAnchor: [0, -22]
+      popupAnchor: [0, -22],
     });
 
     if (mapRef.current.clientMarker) {
-      mapRef.current.clientMarker.setLatLng([
-        clientLocation.latitude,
-        clientLocation.longitude
-      ]);
+      mapRef.current.clientMarker.setLatLng([clientLocation.latitude, clientLocation.longitude]);
     } else {
-      mapRef.current.clientMarker = L.marker(
-        [clientLocation.latitude, clientLocation.longitude],
-        { icon: clientIcon }
-      )
+      mapRef.current.clientMarker = L.marker([clientLocation.latitude, clientLocation.longitude], {
+        icon: clientIcon,
+      })
         .bindPopup('Ubicación del Cliente')
         .addTo(mapRef.current);
     }
@@ -199,7 +199,10 @@ export function RideMap({
         mapRef.current.removeLayer(mapRef.current.driverMarker);
         mapRef.current.driverMarker = null;
       }
-      if (mapRef.current.clientMarker && (!rideStatus || rideStatus === 'COMPLETED' || rideStatus === 'CANCELED')) {
+      if (
+        mapRef.current.clientMarker &&
+        (!rideStatus || rideStatus === 'COMPLETED' || rideStatus === 'CANCELED')
+      ) {
         mapRef.current.removeLayer(mapRef.current.clientMarker);
         mapRef.current.clientMarker = null;
       }
@@ -220,13 +223,13 @@ export function RideMap({
     mapRef.current.polyline = L.polyline(
       [
         [driverLocation.latitude, driverLocation.longitude],
-        [clientLocation.latitude, clientLocation.longitude]
+        [clientLocation.latitude, clientLocation.longitude],
       ],
       {
         color: '#6b21a8',
         weight: 4,
         opacity: 0.8,
-        dashArray: '5, 5'
+        dashArray: '5, 5',
       }
     ).addTo(mapRef.current);
 
@@ -234,10 +237,7 @@ export function RideMap({
     if (!hasFittedBoundsRef.current && mapRef.current.driverMarker && mapRef.current.clientMarker) {
       hasFittedBoundsRef.current = true;
       userInteractedRef.current = false;
-      const group = L.featureGroup([
-        mapRef.current.driverMarker,
-        mapRef.current.clientMarker
-      ]);
+      const group = L.featureGroup([mapRef.current.driverMarker, mapRef.current.clientMarker]);
       mapRef.current.fitBounds(group.getBounds().pad(0.2));
     }
   }, [L, driverLocation, clientLocation, rideStatus]);
@@ -262,9 +262,13 @@ export function RideMap({
     if (!mapRef.current) return;
     userInteractedRef.current = false;
     if (isDriverView && driverLocation) {
-      mapRef.current.setView([driverLocation.latitude, driverLocation.longitude], 16, { animate: true });
+      mapRef.current.setView([driverLocation.latitude, driverLocation.longitude], 16, {
+        animate: true,
+      });
     } else if (clientLocation) {
-      mapRef.current.setView([clientLocation.latitude, clientLocation.longitude], 16, { animate: true });
+      mapRef.current.setView([clientLocation.latitude, clientLocation.longitude], 16, {
+        animate: true,
+      });
     }
   };
 
@@ -273,7 +277,7 @@ export function RideMap({
     userInteractedRef.current = false;
     const group = L.featureGroup([
       L.marker([driverLocation.latitude, driverLocation.longitude]),
-      L.marker([clientLocation.latitude, clientLocation.longitude])
+      L.marker([clientLocation.latitude, clientLocation.longitude]),
     ]);
     mapRef.current.fitBounds(group.getBounds().pad(0.2));
   };
@@ -287,25 +291,29 @@ export function RideMap({
         style={{
           height: '100%',
           width: '100%',
-          minHeight: '500px'
+          minHeight: '500px',
         }}
       />
 
       {/* Información de viaje - distancia */}
-      {driverLocation && clientLocation && rideStatus && rideStatus !== 'COMPLETED' && rideStatus !== 'CANCELED' && (
-        <div className="absolute left-3 z-10" style={{ top: isDriverView ? '7rem' : '5rem' }}>
-          <div className="glass-card rounded-xl shadow-lg px-3 py-2 max-w-[170px]">
-            {/* Distancia */}
-            <div className="flex items-center gap-2">
-              <MapPinIcon className="w-4 h-4 text-blue-400 flex-shrink-0" />
-              <div className="min-w-0">
-                <p className="text-[10px] text-muted-foreground leading-none">Distancia</p>
-                <p className="font-bold text-sm text-foreground">{distance.toFixed(2)} km</p>
+      {driverLocation &&
+        clientLocation &&
+        rideStatus &&
+        rideStatus !== 'COMPLETED' &&
+        rideStatus !== 'CANCELED' && (
+          <div className="absolute left-3 z-10" style={{ top: isDriverView ? '7rem' : '5rem' }}>
+            <div className="glass-card rounded-xl shadow-lg px-3 py-2 max-w-[170px]">
+              {/* Distancia */}
+              <div className="flex items-center gap-2">
+                <MapPinIcon className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-[10px] text-muted-foreground leading-none">Distancia</p>
+                  <p className="font-bold text-sm text-foreground">{distance.toFixed(2)} km</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Controles de zoom y navegación */}
       <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-10">
@@ -333,16 +341,20 @@ export function RideMap({
         >
           <Navigation className="w-4 h-4" />
         </Button>
-        {driverLocation && clientLocation && rideStatus && rideStatus !== 'COMPLETED' && rideStatus !== 'CANCELED' && (
-          <Button
-            size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
-            onClick={handleFitBothMarkers}
-            title="Ver ambos puntos"
-          >
-            <MapPinIcon className="w-4 h-4" />
-          </Button>
-        )}
+        {driverLocation &&
+          clientLocation &&
+          rideStatus &&
+          rideStatus !== 'COMPLETED' &&
+          rideStatus !== 'CANCELED' && (
+            <Button
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+              onClick={handleFitBothMarkers}
+              title="Ver ambos puntos"
+            >
+              <MapPinIcon className="w-4 h-4" />
+            </Button>
+          )}
       </div>
     </div>
   );
