@@ -16,10 +16,7 @@ export async function POST(request: NextRequest) {
     const { paymentIntentId } = await request.json();
 
     if (!process.env.STRIPE_SECRET_KEY) {
-      return NextResponse.json(
-        { message: 'Stripe no configurado' },
-        { status: 503 }
-      );
+      return NextResponse.json({ message: 'Stripe no configurado' }, { status: 503 });
     }
 
     // Retrieve payment intent from Stripe
@@ -56,9 +53,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: paymentIntent.status });
   } catch (error) {
     console.error('Error confirming payment:', error);
-    return NextResponse.json(
-      { message: 'Error al confirmar el pago' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al confirmar el pago' }, { status: 500 });
   }
 }

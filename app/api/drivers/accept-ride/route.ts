@@ -29,14 +29,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify ride exists and is still REQUESTED
-    const existingRide = await withRetry(() =>
-      prisma.ride.findUnique({ where: { id: rideId } })
-    );
+    const existingRide = await withRetry(() => prisma.ride.findUnique({ where: { id: rideId } }));
     if (!existingRide || existingRide.status !== 'REQUESTED') {
-      return NextResponse.json(
-        { message: 'Este viaje ya no está disponible' },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: 'Este viaje ya no está disponible' }, { status: 400 });
     }
 
     const ride = await withRetry(() =>
@@ -56,9 +51,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(ride);
   } catch (error) {
     console.error('Error accepting ride:', error);
-    return NextResponse.json(
-      { message: 'Error al aceptar el viaje' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al aceptar el viaje' }, { status: 500 });
   }
 }

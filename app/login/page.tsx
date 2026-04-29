@@ -38,12 +38,12 @@ export default function LoginPage() {
         });
         if (result?.ok || result?.error === 'CredentialsSignin') break;
         // If it's a server error (not invalid creds), wait and retry
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise((r) => setTimeout(r, 1000));
       }
 
       if (result?.ok) {
         toast.success('Sesión iniciada');
-        
+
         // Retry fetching user role
         let userData = null;
         for (let attempt = 0; attempt < 3; attempt++) {
@@ -59,9 +59,9 @@ export default function LoginPage() {
           } catch {
             // retry
           }
-          await new Promise(r => setTimeout(r, 500));
+          await new Promise((r) => setTimeout(r, 500));
         }
-        
+
         if (userData?.role === 'CLIENT') {
           router.push('/client/dashboard');
         } else if (userData?.role === 'DRIVER') {
@@ -107,9 +107,13 @@ export default function LoginPage() {
         )}
 
         <div>
-          <Label htmlFor="email" className="text-muted-foreground text-sm">Correo Electrónico</Label>
+          <Label htmlFor="email" className="text-muted-foreground text-sm">
+            Correo Electrónico
+          </Label>
           <div className="relative mt-1.5">
-            <Mail className={`absolute left-3 top-3 w-4 h-4 ${hasError ? 'text-destructive' : 'text-muted-foreground'}`} />
+            <Mail
+              className={`absolute left-3 top-3 w-4 h-4 ${hasError ? 'text-destructive' : 'text-muted-foreground'}`}
+            />
             <Input
               id="email"
               type="email"
@@ -126,9 +130,13 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <Label htmlFor="password" className="text-muted-foreground text-sm">Contraseña</Label>
+          <Label htmlFor="password" className="text-muted-foreground text-sm">
+            Contraseña
+          </Label>
           <div className="relative mt-1.5">
-            <Lock className={`absolute left-3 top-3 w-4 h-4 ${hasError ? 'text-destructive' : 'text-muted-foreground'}`} />
+            <Lock
+              className={`absolute left-3 top-3 w-4 h-4 ${hasError ? 'text-destructive' : 'text-muted-foreground'}`}
+            />
             <Input
               id="password"
               type="password"

@@ -30,18 +30,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (ride.status !== 'REQUESTED') {
-      return NextResponse.json(
-        { message: 'No puedes rechazar este viaje' },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: 'No puedes rechazar este viaje' }, { status: 400 });
     }
 
     return NextResponse.json({ message: 'Viaje rechazado exitosamente' });
   } catch (error) {
     console.error('Error rejecting ride:', error);
-    return NextResponse.json(
-      { message: 'Error al rechazar el viaje' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al rechazar el viaje' }, { status: 500 });
   }
 }

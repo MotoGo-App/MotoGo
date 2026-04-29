@@ -21,9 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify user is part of this ride
-    const ride = await withRetry(() =>
-      prisma.ride.findUnique({ where: { id: rideId } })
-    );
+    const ride = await withRetry(() => prisma.ride.findUnique({ where: { id: rideId } }));
 
     if (!ride) {
       return NextResponse.json({ message: 'Viaje no encontrado' }, { status: 404 });
@@ -49,10 +47,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(messages);
   } catch (error) {
     console.error('Error fetching messages:', error);
-    return NextResponse.json(
-      { message: 'Error al obtener mensajes' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al obtener mensajes' }, { status: 500 });
   }
 }
 
@@ -71,9 +66,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user is part of this ride
-    const ride = await withRetry(() =>
-      prisma.ride.findUnique({ where: { id: rideId } })
-    );
+    const ride = await withRetry(() => prisma.ride.findUnique({ where: { id: rideId } }));
 
     if (!ride) {
       return NextResponse.json({ message: 'Viaje no encontrado' }, { status: 404 });
@@ -109,9 +102,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(message);
   } catch (error) {
     console.error('Error sending message:', error);
-    return NextResponse.json(
-      { message: 'Error al enviar mensaje' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al enviar mensaje' }, { status: 500 });
   }
 }

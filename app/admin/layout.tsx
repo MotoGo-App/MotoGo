@@ -8,11 +8,7 @@ import { Container } from '@/components/layouts/container';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession() || {};
   const router = useRouter();
 
@@ -39,10 +35,10 @@ export default function AdminLayout({
         <Container size="lg">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <Image 
-                src="/motogo-logo.png" 
-                alt="MotoGo" 
-                width={120} 
+              <Image
+                src="/motogo-logo.png"
+                alt="MotoGo"
+                width={120}
                 height={45}
                 priority
                 className="h-10 w-auto"
@@ -63,9 +59,7 @@ export default function AdminLayout({
           </div>
         </Container>
       </header>
-      <main className="py-8">
-        {children}
-      </main>
+      <main className="py-8">{children}</main>
     </div>
   );
 }
