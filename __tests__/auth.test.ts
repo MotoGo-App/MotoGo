@@ -9,7 +9,6 @@ describe('Auth Configuration (NextAuth)', () => {
       const mockUser = { id: 'user-123', email: 'test@motogo.com', role: 'DRIVER' };
       const mockToken = {};
 
-      // Ejecutamos la callback jwt
       const resultToken = await authOptions.callbacks?.jwt?.({ 
         token: mockToken, 
         user: mockUser 
@@ -23,16 +22,14 @@ describe('Auth Configuration (NextAuth)', () => {
       const mockToken = { id: 'user-123', role: 'ADMIN' };
       const mockSession = { user: { name: 'Admin' } };
 
-      // Ejecutamos la callback session
       const resultSession = await authOptions.callbacks?.session?.({ 
         session: mockSession as any, 
         token: mockToken as any 
       } as any);
 
-      expect(resultSession.user).toHaveProperty('id', 'user-123');
-      expect(resultSession.user).toHaveProperty('role', 'ADMIN');
+      expect(resultSession!.user).toHaveProperty('id', 'user-123');
+      expect(resultSession!.user).toHaveProperty('role', 'ADMIN');
     });
-  });
 
   describe('General Config', () => {
     it('debería usar la estrategia JWT', () => {
@@ -43,4 +40,5 @@ describe('Auth Configuration (NextAuth)', () => {
       expect(authOptions.pages?.signIn).toBe('/login');
     });
   });
+});
 });
