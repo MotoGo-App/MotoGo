@@ -14,7 +14,7 @@ describe('Home Page Auth Redirection', () => {
   it('debería redirigir al dashboard de CLIENT si el rol es CLIENT', async () => {
     (useSession as any).mockReturnValue({
       data: { user: { role: 'CLIENT' } },
-      status: 'authenticated'
+      status: 'authenticated',
     });
 
     render(<Home />);

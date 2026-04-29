@@ -2,16 +2,14 @@ import { describe, it, expect, vi } from 'vitest';
 import { authOptions } from '../lib/auth';
 
 describe('Auth Configuration (NextAuth)', () => {
-  
   describe('Callbacks', () => {
-    
     it('jwt callback debería añadir el id y el role al token cuando el usuario se loguea', async () => {
       const mockUser = { id: 'user-123', email: 'test@motogo.com', role: 'DRIVER' };
       const mockToken = {};
 
-      const resultToken = await authOptions.callbacks?.jwt?.({ 
-        token: mockToken, 
-        user: mockUser 
+      const resultToken = await authOptions.callbacks?.jwt?.({
+        token: mockToken,
+        user: mockUser,
       } as any);
 
       expect(resultToken).toHaveProperty('id', 'user-123');
@@ -22,23 +20,23 @@ describe('Auth Configuration (NextAuth)', () => {
       const mockToken = { id: 'user-123', role: 'ADMIN' };
       const mockSession = { user: { name: 'Admin' } };
 
-      const resultSession = await authOptions.callbacks?.session?.({ 
-        session: mockSession as any, 
-        token: mockToken as any 
+      const resultSession = await authOptions.callbacks?.session?.({
+        session: mockSession as any,
+        token: mockToken as any,
       } as any);
 
       expect(resultSession!.user).toHaveProperty('id', 'user-123');
       expect(resultSession!.user).toHaveProperty('role', 'ADMIN');
     });
 
-  describe('General Config', () => {
-    it('debería usar la estrategia JWT', () => {
-      expect(authOptions.session?.strategy).toBe('jwt');
-    });
+    describe('General Config', () => {
+      it('debería usar la estrategia JWT', () => {
+        expect(authOptions.session?.strategy).toBe('jwt');
+      });
 
-    it('debería tener configurada la página de login correcta', () => {
-      expect(authOptions.pages?.signIn).toBe('/login');
+      it('debería tener configurada la página de login correcta', () => {
+        expect(authOptions.pages?.signIn).toBe('/login');
+      });
     });
   });
-});
 });

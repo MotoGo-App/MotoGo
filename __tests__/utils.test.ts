@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { cn, calculateDistance, formatCurrency } from '../lib/utils';
 
 describe('Utils Functions', () => {
-  
   describe('cn (Tailwind Merge)', () => {
     it('debería combinar clases de tailwind correctamente', () => {
       const result = cn('px-2 py-2', 'bg-red-500');
@@ -19,10 +18,10 @@ describe('Utils Functions', () => {
     it('debería calcular la distancia entre dos puntos conocidos', () => {
       const cdmx = { lat: 19.4326, lon: -99.1332 };
       const puebla = { lat: 19.0414, lon: -98.2063 };
-      
+
       const distance = calculateDistance(cdmx.lat, cdmx.lon, puebla.lat, puebla.lon);
-      
-      expect(distance).toBeCloseTo(106.6, 1); 
+
+      expect(distance).toBeCloseTo(106.6, 1);
     });
 
     it('debería retornar 0 si las coordenadas son las mismas', () => {
