@@ -10,7 +10,9 @@
     "start": "next start",
     "lint": "eslint . --quiet",
     "type-check": "tsc --noEmit",
-    "test": "vitest"
+    "test": "vitest",
+    "format:check": "prettier --check .",
+    "format": "prettier --write ."
   },
   "prisma": {
     "seed": "tsx --require dotenv/config scripts/safe-seed.ts"
