@@ -7,10 +7,7 @@ export async function POST(request: NextRequest) {
     const { email, password, name, role } = await request.json();
 
     if (!email || !password || !name) {
-      return NextResponse.json(
-        { message: 'Faltan campos requeridos' },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: 'Faltan campos requeridos' }, { status: 400 });
     }
 
     const existingUser = await withRetry(() =>
@@ -20,22 +17,21 @@ export async function POST(request: NextRequest) {
     );
 
     if (existingUser) {
-      return NextResponse.json(
-        { message: 'El usuario ya existe' },
-        { status: 409 }
-      );
+      return NextResponse.json({ message: 'El usuario ya existe' }, { status: 409 });
     }
 
     const hashedPassword = await bcryptjs.hash(password, 10);
 
-    const user = await withRetry(() => prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name,
-        role: role || 'CLIENT',
-      },
-    }));
+    const user = await withRetry(() =>
+      prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          name,
+          role: role || 'CLIENT',
+        },
+      })
+    );
 
     // If DRIVER role, create driver profile and free subscription
     if (user.role === 'DRIVER') {
@@ -76,9 +72,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Usuario creado exitosamente' }, { status: 201 });
   } catch (error) {
     console.error('Signup error:', error);
-    return NextResponse.json(
-      { message: 'Error al crear el usuario' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al crear el usuario' }, { status: 500 });
   }
 }

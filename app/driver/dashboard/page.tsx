@@ -6,7 +6,18 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { MapPin, CheckCircle, Clock, DollarSign, ChevronUp, ChevronDown, X, List, Navigation, User } from 'lucide-react';
+import {
+  MapPin,
+  CheckCircle,
+  Clock,
+  DollarSign,
+  ChevronUp,
+  ChevronDown,
+  X,
+  List,
+  Navigation,
+  User,
+} from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { RideMap } from '@/components/map';
@@ -113,7 +124,9 @@ export default function DriverDashboard() {
 
     return () => {
       if (noSleepRef.current) {
-        try { noSleepRef.current.disable(); } catch {}
+        try {
+          noSleepRef.current.disable();
+        } catch {}
       }
     };
   }, [isOnline, statusLoaded]);
@@ -170,7 +183,9 @@ export default function DriverDashboard() {
         });
         if (res.ok) {
           saved = true;
-          toast.success(newStatus ? '¡Estás en línea! Recibirás viajes.' : 'Desconectado. No recibirás viajes.');
+          toast.success(
+            newStatus ? '¡Estás en línea! Recibirás viajes.' : 'Desconectado. No recibirás viajes.'
+          );
           break;
         }
       } catch (e) {
@@ -242,7 +257,9 @@ export default function DriverDashboard() {
             // Permission denied
             if (!permissionDenied) {
               permissionDenied = true;
-              toast.error('Permite el acceso a tu ubicación para usar MotoGo. Activa el GPS en la configuración de tu navegador.');
+              toast.error(
+                'Permite el acceso a tu ubicación para usar MotoGo. Activa el GPS en la configuración de tu navegador.'
+              );
             }
           } else if (error.code === 2) {
             // Position unavailable - retry with low accuracy
@@ -313,7 +330,8 @@ export default function DriverDashboard() {
 
   // Actualizar viaje seleccionado cuando hay viajes activos
   useEffect(() => {
-    const activeRides = rides?.filter((r) => r.status === 'ACCEPTED' || r.status === 'IN_PROGRESS') ?? [];
+    const activeRides =
+      rides?.filter((r) => r.status === 'ACCEPTED' || r.status === 'IN_PROGRESS') ?? [];
     if (activeRides.length > 0) {
       const active = activeRides[0];
       setSelectedRide(active);
@@ -432,7 +450,11 @@ export default function DriverDashboard() {
 
   // Solicitar permisos de notificación
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+    if (
+      typeof window !== 'undefined' &&
+      'Notification' in window &&
+      Notification.permission === 'default'
+    ) {
       Notification.requestPermission();
     }
   }, []);
@@ -471,7 +493,9 @@ export default function DriverDashboard() {
               : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
           }`}
         >
-          <span className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-white animate-pulse' : 'bg-muted-foreground/50'}`} />
+          <span
+            className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-white animate-pulse' : 'bg-muted-foreground/50'}`}
+          />
           {isOnline ? 'En Línea' : 'Desconectado'}
         </button>
       </div>
@@ -519,8 +543,8 @@ export default function DriverDashboard() {
           {selectedRide
             ? 'Ver viaje activo'
             : availableRides.length > 0
-            ? `${availableRides.length} viaje${availableRides.length > 1 ? 's' : ''} disponible${availableRides.length > 1 ? 's' : ''}`
-            : 'Ver viajes'}
+              ? `${availableRides.length} viaje${availableRides.length > 1 ? 's' : ''} disponible${availableRides.length > 1 ? 's' : ''}`
+              : 'Ver viajes'}
         </button>
       )}
 
@@ -580,16 +604,25 @@ export default function DriverDashboard() {
                           {selectedRide.client.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-foreground truncate">{selectedRide.client.name}</p>
+                          <p className="font-semibold text-foreground truncate">
+                            {selectedRide.client.name}
+                          </p>
                           {selectedRide.client.phone && (
-                            <a href={`tel:${selectedRide.client.phone}`} className="text-xs text-primary hover:underline">
+                            <a
+                              href={`tel:${selectedRide.client.phone}`}
+                              className="text-xs text-primary hover:underline"
+                            >
                               📞 {selectedRide.client.phone}
                             </a>
                           )}
                         </div>
-                        <Badge className={`text-xs ${
-                          selectedRide.status === 'ACCEPTED' ? 'bg-blue-500/15 text-blue-400' : 'bg-green-500/15 text-green-400'
-                        }`}>
+                        <Badge
+                          className={`text-xs ${
+                            selectedRide.status === 'ACCEPTED'
+                              ? 'bg-blue-500/15 text-blue-400'
+                              : 'bg-green-500/15 text-green-400'
+                          }`}
+                        >
                           {selectedRide.status === 'ACCEPTED' ? '🏍️ En camino' : '🚗 En viaje'}
                         </Badge>
                       </div>
@@ -642,7 +675,10 @@ export default function DriverDashboard() {
               <div className="space-y-3">
                 {availableRides.length > 0 ? (
                   availableRides.map((ride) => (
-                    <Card key={ride.id} className="border-border/30 hover:border-primary/30 hover:shadow-md transition-all">
+                    <Card
+                      key={ride.id}
+                      className="border-border/30 hover:border-primary/30 hover:shadow-md transition-all"
+                    >
                       <CardContent className="p-4">
                         {/* Info del cliente */}
                         {ride.client && (
@@ -651,9 +687,13 @@ export default function DriverDashboard() {
                               {ride.client.name.charAt(0).toUpperCase()}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-foreground truncate">{ride.client.name}</p>
+                              <p className="text-sm font-semibold text-foreground truncate">
+                                {ride.client.name}
+                              </p>
                               {ride.client.phone && (
-                                <p className="text-xs text-muted-foreground">📞 {ride.client.phone}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  📞 {ride.client.phone}
+                                </p>
                               )}
                             </div>
                           </div>
@@ -666,7 +706,9 @@ export default function DriverDashboard() {
                           </div>
                           <div className="flex-1">
                             <p className="font-medium text-sm">{ride.originAddress}</p>
-                            <p className="text-sm text-muted-foreground mt-1">{ride.destinationAddress}</p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {ride.destinationAddress}
+                            </p>
                             <p className="text-xs text-muted-foreground mt-1">
                               {new Date(ride.createdAt).toLocaleString('es-MX')}
                             </p>
@@ -697,7 +739,9 @@ export default function DriverDashboard() {
                   <div className="text-center py-8">
                     <Clock className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
                     <p className="text-muted-foreground text-sm">Esperando viajes...</p>
-                    <p className="text-muted-foreground/60 text-xs mt-1">Los nuevos viajes aparecerán aquí</p>
+                    <p className="text-muted-foreground/60 text-xs mt-1">
+                      Los nuevos viajes aparecerán aquí
+                    </p>
                   </div>
                 )}
               </div>
@@ -707,10 +751,11 @@ export default function DriverDashboard() {
       )}
 
       {/* Chat - visible durante viajes ACCEPTED o IN_PROGRESS */}
-      {selectedRide && session?.user?.id &&
+      {selectedRide &&
+        session?.user?.id &&
         (selectedRide.status === 'ACCEPTED' || selectedRide.status === 'IN_PROGRESS') && (
-        <RideChat rideId={selectedRide.id} currentUserId={session.user.id} />
-      )}
+          <RideChat rideId={selectedRide.id} currentUserId={session.user.id} />
+        )}
 
       {/* Rating Modal - Aparece cuando se completa un viaje */}
       {justCompletedRide && (

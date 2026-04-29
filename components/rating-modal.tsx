@@ -133,7 +133,10 @@ export function RatingModal({
 
           {/* Comment */}
           <div>
-            <label htmlFor="comment" className="block text-sm font-medium text-muted-foreground mb-2">
+            <label
+              htmlFor="comment"
+              className="block text-sm font-medium text-muted-foreground mb-2"
+            >
               Comentario (opcional)
             </label>
             <textarea

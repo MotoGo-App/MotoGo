@@ -11,7 +11,7 @@ export const prisma =
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 /**
- * Retry wrapper for database operations that may fail due to 
+ * Retry wrapper for database operations that may fail due to
  * PostgreSQL idle-session timeouts or transient connection errors.
  */
 export async function withRetry<T>(
@@ -31,23 +31,23 @@ export async function withRetry<T>(
         errorMsg.includes('terminating connection') ||
         errorMsg.includes('Connection refused') ||
         errorMsg.includes('connection closed') ||
-        errorMsg.includes('Can\'t reach database') ||
+        errorMsg.includes("Can't reach database") ||
         errorMsg.includes('ConnectionError') ||
         errorMsg.includes('ECONNRESET') ||
         errorMsg.includes('ECONNREFUSED') ||
         errorMsg.includes('prepared statement');
-      
+
       if (!isTransient || attempt === maxRetries) {
         throw error;
       }
-      
+
       // Disconnect to force a fresh connection on retry
       try {
         await prisma.$disconnect();
       } catch {
         // ignore disconnect errors
       }
-      
+
       await new Promise((resolve) => setTimeout(resolve, delayMs * attempt));
     }
   }

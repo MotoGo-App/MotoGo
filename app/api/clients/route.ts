@@ -12,9 +12,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
     }
 
-    const user = await withRetry(() =>
-      prisma.user.findUnique({ where: { id: session.user!.id } })
-    );
+    const user = await withRetry(() => prisma.user.findUnique({ where: { id: session.user!.id } }));
 
     if (user?.role !== 'ADMIN') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 });

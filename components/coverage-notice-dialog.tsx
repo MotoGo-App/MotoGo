@@ -47,8 +47,7 @@ export function CoverageNoticeDialog() {
     try {
       // Si el usuario ya marcó "no volver a mostrar", no mostrar nunca
       const dismissedForever =
-        typeof window !== 'undefined' &&
-        window.localStorage.getItem(DISMISS_KEY) === 'true';
+        typeof window !== 'undefined' && window.localStorage.getItem(DISMISS_KEY) === 'true';
       if (dismissedForever) return;
 
       // Si ya se mostró en esta sesión del navegador, no volver a mostrar hasta el siguiente login
@@ -99,33 +98,24 @@ export function CoverageNoticeDialog() {
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
             <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
           </div>
-          <DialogTitle className="text-center text-lg">
-            Área de cobertura
-          </DialogTitle>
+          <DialogTitle className="text-center text-lg">Área de cobertura</DialogTitle>
           <DialogDescription className="text-center text-base text-foreground/80 pt-2 leading-relaxed">
             <span className="block">
-              ¡Recuerda que los servicios de mototaxis solo están disponibles en
-              el pueblo!
+              ¡Recuerda que los servicios de mototaxis solo están disponibles en el pueblo!
             </span>
             <span className="block mt-3">
-              No hay alcance hacia la{' '}
-              <strong className="text-foreground">zona norte</strong>,{' '}
+              No hay alcance hacia la <strong className="text-foreground">zona norte</strong>,{' '}
               <strong className="text-foreground">malecón</strong>,{' '}
-              <strong className="text-foreground">Avenida Melgar</strong> y
-              destinos aledaños.
+              <strong className="text-foreground">Avenida Melgar</strong> y destinos aledaños.
             </span>
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex items-center justify-center gap-2 py-3">
           <MapPin className="h-4 w-4 text-primary" />
-          <span className="text-sm font-medium text-primary">
-            ¡Disfruta tu viaje!
-          </span>
+          <span className="text-sm font-medium text-primary">¡Disfruta tu viaje!</span>
         </div>
-        <p className="text-center text-xs text-muted-foreground italic -mt-2">
-          — Equipo de MotoGo
-        </p>
+        <p className="text-center text-xs text-muted-foreground italic -mt-2">— Equipo de MotoGo</p>
 
         <div className="flex items-center space-x-2 pt-2 border-t border-border/50 mt-2">
           <Checkbox
@@ -142,11 +132,7 @@ export function CoverageNoticeDialog() {
         </div>
 
         <DialogFooter>
-          <Button
-            type="button"
-            onClick={() => handleClose(false)}
-            className="w-full"
-          >
+          <Button type="button" onClick={() => handleClose(false)} className="w-full">
             Entendido
           </Button>
         </DialogFooter>

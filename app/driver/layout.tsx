@@ -7,11 +7,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 
-export default function DriverLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DriverLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession() || {};
   const router = useRouter();
   const pathname = usePathname();
@@ -42,10 +38,10 @@ export default function DriverLayout({
         <header className="absolute top-0 left-0 right-0 z-50 pointer-events-none">
           <div className="flex justify-between items-center p-3">
             <div className="flex items-center glass-card rounded-xl px-3 py-2 pointer-events-auto">
-              <Image 
-                src="/motogo-logo.png" 
-                alt="MotoGo" 
-                width={100} 
+              <Image
+                src="/motogo-logo.png"
+                alt="MotoGo"
+                width={100}
                 height={38}
                 priority
                 className="h-8 w-auto"
@@ -66,9 +62,7 @@ export default function DriverLayout({
             </div>
           </div>
         </header>
-        <main className="h-full w-full">
-          {children}
-        </main>
+        <main className="h-full w-full">{children}</main>
       </div>
     );
   }
@@ -79,19 +73,17 @@ export default function DriverLayout({
       <header className="sticky top-0 z-50 glass-card border-b border-border/30">
         <div className="flex justify-between items-center px-4 py-3">
           <div className="flex items-center">
-            <Image 
-              src="/motogo-logo.png" 
-              alt="MotoGo" 
-              width={100} 
+            <Image
+              src="/motogo-logo.png"
+              alt="MotoGo"
+              width={100}
               height={38}
               priority
               className="h-8 w-auto"
             />
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">
-              {session?.user?.name}
-            </span>
+            <span className="text-sm text-muted-foreground">{session?.user?.name}</span>
             <Button
               size="sm"
               variant="outline"
@@ -103,9 +95,7 @@ export default function DriverLayout({
           </div>
         </div>
       </header>
-      <main className="pb-8">
-        {children}
-      </main>
+      <main className="pb-8">{children}</main>
     </div>
   );
 }

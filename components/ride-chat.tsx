@@ -146,10 +146,7 @@ export function RideChat({ rideId, currentUserId }: RideChatProps) {
                 messages.map((msg) => {
                   const isMe = msg.senderId === currentUserId;
                   return (
-                    <div
-                      key={msg.id}
-                      className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
-                    >
+                    <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                       <div
                         className={`max-w-[80%] rounded-2xl px-3.5 py-2 ${
                           isMe
@@ -158,9 +155,7 @@ export function RideChat({ rideId, currentUserId }: RideChatProps) {
                         }`}
                       >
                         {!isMe && (
-                          <p className="text-xs font-medium mb-0.5 opacity-70">
-                            {msg.sender.name}
-                          </p>
+                          <p className="text-xs font-medium mb-0.5 opacity-70">{msg.sender.name}</p>
                         )}
                         <p className="text-sm leading-relaxed break-words">{msg.content}</p>
                         <p
