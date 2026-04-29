@@ -1,19 +1,14 @@
-name: PR Quality Checks
+name: PR Checks
 
 on:
   pull_request:
     branches: ['main']
 
-# Cancel in-progress runs for the same branch/PR when a new commit is pushed.
-# Saves CI minutes and keeps the queue clean.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # ── Job 1: Lint & Format ────────────────────────────────────────────────────
-  # Runs ESLint (code quality + style) and Prettier (formatting).
-  # Fails immediately if any rule is violated or any file isn't formatted.
   lint:
     name: Lint & Format
     runs-on: ubuntu-latest
@@ -21,16 +16,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 22
+      - name: Setup Node.js 22.13
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '22.13'
           cache: 'yarn'
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # Prisma generates types that some files import — needed for ESLint to resolve them.
       - name: Generate Prisma client
         run: yarn prisma generate
 
@@ -40,9 +34,6 @@ jobs:
       - name: Check Prettier formatting
         run: yarn format:check
 
-  # ── Job 2: Type Check ────────────────────────────────────────────────────────
-  # Runs the TypeScript compiler in check-only mode (no output files).
-  # Catches type errors that ESLint cannot detect.
   type-check:
     name: Type Check
     runs-on: ubuntu-latest
@@ -50,10 +41,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 22
+      - name: Setup Node.js 22.13
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '22.13'
           cache: 'yarn'
 
       - name: Install dependencies
@@ -62,10 +53,6 @@ jobs:
       - name: Run TypeScript compiler
         run: yarn type-check
 
-  # ── Job 3: Tests ─────────────────────────────────────────────────────────────
-  # Runs Vitest unit tests and generates a coverage report.
-  # passWithNoTests is set in vitest.config.ts so this passes even with 0 tests.
-  # The coverage artifact is uploaded so you can inspect it in the GitHub UI.
   test:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -73,10 +60,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 22
+      - name: Setup Node.js 22.13
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '22.13'
           cache: 'yarn'
 
       - name: Install dependencies
@@ -93,11 +80,6 @@ jobs:
           path: coverage/
           retention-days: 7
 
-  # ── Job 4: Build ─────────────────────────────────────────────────────────────
-  # Only runs if lint, type-check, AND test all pass (needs: [...]).
-  # This is the gate job — branch protection rules should require this job
-  # to pass before a PR can be merged.
-  # Uses dummy env vars so Next.js can compile without a real database.
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -106,10 +88,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 22
+      - name: Setup Node.js 22.13
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '22.13'
           cache: 'yarn'
 
       - name: Install dependencies
