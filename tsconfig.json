@@ -44,12 +44,5 @@
     "**/*.test.ts",
     "**/*.test.tsx"
   ],
-<<<<<<< HEAD
-  "exclude": [
-    "node_modules"
-  ]
-}
-=======
   "exclude": ["node_modules", "vitest.config.ts", "vitest.setup.ts"]
 }
->>>>>>> f76f5ce0b88bc54f63822075b78d39d580efe242
