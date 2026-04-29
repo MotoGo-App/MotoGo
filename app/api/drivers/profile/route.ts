@@ -26,19 +26,13 @@ export async function GET(request: NextRequest) {
     });
 
     if (!driver) {
-      return NextResponse.json(
-        { message: 'Conductor no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: 'Conductor no encontrado' }, { status: 404 });
     }
 
     return NextResponse.json(driver);
   } catch (error) {
     console.error('Error fetching driver profile:', error);
-    return NextResponse.json(
-      { message: 'Error al obtener el perfil' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al obtener el perfil' }, { status: 500 });
   }
 }
 
@@ -67,10 +61,7 @@ export async function PATCH(request: NextRequest) {
     });
 
     if (!driver) {
-      return NextResponse.json(
-        { message: 'Conductor no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: 'Conductor no encontrado' }, { status: 404 });
     }
 
     // Validar unicidad de licencia si se cambia
@@ -92,10 +83,7 @@ export async function PATCH(request: NextRequest) {
         where: { vehiclePlate, id: { not: driver.id } },
       });
       if (existingPlate) {
-        return NextResponse.json(
-          { message: 'Esa placa ya está registrada' },
-          { status: 409 }
-        );
+        return NextResponse.json({ message: 'Esa placa ya está registrada' }, { status: 409 });
       }
     }
 
@@ -132,9 +120,6 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json(updatedDriver);
   } catch (error) {
     console.error('Error updating driver profile:', error);
-    return NextResponse.json(
-      { message: 'Error al actualizar el perfil' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al actualizar el perfil' }, { status: 500 });
   }
 }

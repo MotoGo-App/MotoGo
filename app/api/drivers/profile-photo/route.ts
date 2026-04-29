@@ -39,10 +39,7 @@ export async function POST(request: NextRequest) {
     );
 
     if (!driver) {
-      return NextResponse.json(
-        { message: 'Conductor no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: 'Conductor no encontrado' }, { status: 404 });
     }
 
     // Generar nombre único para el archivo
@@ -74,9 +71,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error generating presigned URL:', error);
-    return NextResponse.json(
-      { message: 'Error al procesar la foto' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al procesar la foto' }, { status: 500 });
   }
 }

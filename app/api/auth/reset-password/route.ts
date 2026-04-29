@@ -13,7 +13,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (password.length < 6) {
-      return NextResponse.json({ message: 'La contraseña debe tener al menos 6 caracteres' }, { status: 400 });
+      return NextResponse.json(
+        { message: 'La contraseña debe tener al menos 6 caracteres' },
+        { status: 400 }
+      );
     }
 
     // Find valid token
@@ -33,7 +36,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (new Date() > resetToken.expiresAt) {
-      return NextResponse.json({ message: 'El enlace ha expirado. Solicita uno nuevo.' }, { status: 400 });
+      return NextResponse.json(
+        { message: 'El enlace ha expirado. Solicita uno nuevo.' },
+        { status: 400 }
+      );
     }
 
     // Hash new password

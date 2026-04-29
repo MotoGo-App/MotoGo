@@ -135,7 +135,7 @@ export default function DriverProfile() {
       });
 
       if (uploadRes.ok) {
-        setDriver((prev) => prev ? { ...prev, profilePhotoUrl: publicUrl } : null);
+        setDriver((prev) => (prev ? { ...prev, profilePhotoUrl: publicUrl } : null));
         toast.success('Foto de perfil actualizada');
       } else {
         toast.error('Error al subir la foto');
@@ -158,8 +158,10 @@ export default function DriverProfile() {
 
       if (formData.name.trim()) updateData.name = formData.name.trim();
       if (formData.age) updateData.age = parseInt(formData.age);
-      if (formData.drivingExperienceYears) updateData.drivingExperienceYears = parseInt(formData.drivingExperienceYears);
-      if (formData.mototaxiNumber.trim()) updateData.mototaxiNumber = formData.mototaxiNumber.trim();
+      if (formData.drivingExperienceYears)
+        updateData.drivingExperienceYears = parseInt(formData.drivingExperienceYears);
+      if (formData.mototaxiNumber.trim())
+        updateData.mototaxiNumber = formData.mototaxiNumber.trim();
       updateData.bio = formData.bio.trim();
       if (formData.vehicleModel.trim()) updateData.vehicleModel = formData.vehicleModel.trim();
       if (formData.licenseNumber.trim()) updateData.licenseNumber = formData.licenseNumber.trim();
@@ -394,24 +396,18 @@ export default function DriverProfile() {
               style={{ minHeight: '100px', fontSize: '16px' }}
               className="w-full mt-1 px-3 py-2.5 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary bg-secondary/50 text-foreground placeholder:text-muted-foreground/60 resize-vertical"
             />
-            <p className="text-xs text-muted-foreground mt-1 text-right">{formData.bio.length}/200</p>
+            <p className="text-xs text-muted-foreground mt-1 text-right">
+              {formData.bio.length}/200
+            </p>
           </div>
 
           {/* Buttons */}
           <div className="flex gap-3 pt-2">
-            <Button
-              type="submit"
-              disabled={saving}
-              className="flex-1"
-            >
+            <Button type="submit" disabled={saving} className="flex-1">
               {saving ? 'Guardando...' : 'Guardar Cambios'}
             </Button>
             <Link href="/driver/dashboard" className="flex-1">
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full border-border/50"
-              >
+              <Button type="button" variant="outline" className="w-full border-border/50">
                 Volver
               </Button>
             </Link>

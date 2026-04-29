@@ -24,10 +24,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(payments);
   } catch (error) {
     console.error('Error fetching payments:', error);
-    return NextResponse.json(
-      { message: 'Error al obtener pagos' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al obtener pagos' }, { status: 500 });
   }
 }
 
@@ -46,7 +43,8 @@ export async function POST(request: NextRequest) {
 
     if (process.env.STRIPE_SECRET_KEY) {
       const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-      const origin = request.headers.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3000';
+      const origin =
+        request.headers.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
       paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount * 100),
@@ -83,9 +81,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error creating payment:', error);
-    return NextResponse.json(
-      { message: 'Error al crear el pago' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al crear el pago' }, { status: 500 });
   }
 }

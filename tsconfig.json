@@ -2,11 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
@@ -22,11 +18,8 @@
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     },
     "allowJs": true,
     "incremental": true,
@@ -44,9 +37,5 @@
     ".next/types/**/*.ts",
     ".build/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "vitest.config.ts",
-    "vitest.setup.ts"
-  ]
+  "exclude": ["node_modules", "vitest.config.ts", "vitest.setup.ts"]
 }

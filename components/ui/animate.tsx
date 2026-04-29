@@ -1,13 +1,19 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 
-const viewportConfig = { once: true, margin: '-60px' as `${number}px` }
+const viewportConfig = { once: true, margin: '-60px' as `${number}px` };
 
 export function FadeIn({
-  children, delay = 0, duration = 0.4, className,
+  children,
+  delay = 0,
+  duration = 0.4,
+  className,
 }: {
-  children: React.ReactNode; delay?: number; duration?: number; className?: string
+  children: React.ReactNode;
+  delay?: number;
+  duration?: number;
+  className?: string;
 }) {
   return (
     <motion.div
@@ -19,13 +25,17 @@ export function FadeIn({
     >
       {children}
     </motion.div>
-  )
+  );
 }
 
 export function ScaleIn({
-  children, delay = 0, className,
+  children,
+  delay = 0,
+  className,
 }: {
-  children: React.ReactNode; delay?: number; className?: string
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
 }) {
   return (
     <motion.div
@@ -37,20 +47,26 @@ export function ScaleIn({
     >
       {children}
     </motion.div>
-  )
+  );
 }
 
 const slideDirections = {
   bottom: { y: 20, x: 0 },
-  top:    { y: -20, x: 0 },
-  left:   { x: -20, y: 0 },
-  right:  { x: 20, y: 0 },
-}
+  top: { y: -20, x: 0 },
+  left: { x: -20, y: 0 },
+  right: { x: 20, y: 0 },
+};
 
 export function SlideIn({
-  children, from = 'bottom', delay = 0, className,
+  children,
+  from = 'bottom',
+  delay = 0,
+  className,
 }: {
-  children: React.ReactNode; from?: keyof typeof slideDirections; delay?: number; className?: string
+  children: React.ReactNode;
+  from?: keyof typeof slideDirections;
+  delay?: number;
+  className?: string;
 }) {
   return (
     <motion.div
@@ -62,13 +78,17 @@ export function SlideIn({
     >
       {children}
     </motion.div>
-  )
+  );
 }
 
 export function Stagger({
-  children, staggerDelay = 0.08, className,
+  children,
+  staggerDelay = 0.08,
+  className,
 }: {
-  children: React.ReactNode; staggerDelay?: number; className?: string
+  children: React.ReactNode;
+  staggerDelay?: number;
+  className?: string;
 }) {
   return (
     <motion.div
@@ -80,13 +100,15 @@ export function Stagger({
     >
       {children}
     </motion.div>
-  )
+  );
 }
 
 export function StaggerItem({
-  children, className,
+  children,
+  className,
 }: {
-  children: React.ReactNode; className?: string
+  children: React.ReactNode;
+  className?: string;
 }) {
   return (
     <motion.div
@@ -98,13 +120,15 @@ export function StaggerItem({
     >
       {children}
     </motion.div>
-  )
+  );
 }
 
 export function HoverLift({
-  children, className,
+  children,
+  className,
 }: {
-  children: React.ReactNode; className?: string
+  children: React.ReactNode;
+  className?: string;
 }) {
   return (
     <motion.div
@@ -114,13 +138,15 @@ export function HoverLift({
     >
       {children}
     </motion.div>
-  )
+  );
 }
 
 export function PressScale({
-  children, className,
+  children,
+  className,
 }: {
-  children: React.ReactNode; className?: string
+  children: React.ReactNode;
+  className?: string;
 }) {
   return (
     <motion.div
@@ -130,7 +156,7 @@ export function PressScale({
     >
       {children}
     </motion.div>
-  )
+  );
 }
 
 export function SkeletonPulse({ className }: { className?: string }) {
@@ -140,5 +166,5 @@ export function SkeletonPulse({ className }: { className?: string }) {
       transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
       className={`rounded-md bg-muted ${className ?? ''}`}
     />
-  )
+  );
 }

@@ -88,7 +88,9 @@ export default function Home() {
           </div>
           <div>
             <h3 className="font-semibold font-display text-foreground">Mapa en Tiempo Real</h3>
-            <p className="text-sm text-muted-foreground">Rastrea conductores cerca de ti al instante</p>
+            <p className="text-sm text-muted-foreground">
+              Rastrea conductores cerca de ti al instante
+            </p>
           </div>
         </div>
 
@@ -98,7 +100,9 @@ export default function Home() {
           </div>
           <div>
             <h3 className="font-semibold font-display text-foreground">Viajes Seguros</h3>
-            <p className="text-sm text-muted-foreground">Conductores verificados para tu tranquilidad</p>
+            <p className="text-sm text-muted-foreground">
+              Conductores verificados para tu tranquilidad
+            </p>
           </div>
         </div>
 
@@ -107,7 +111,9 @@ export default function Home() {
             <Star className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h3 className="font-semibold font-display text-foreground">Sistema de Calificaciones</h3>
+            <h3 className="font-semibold font-display text-foreground">
+              Sistema de Calificaciones
+            </h3>
             <p className="text-sm text-muted-foreground">Mantén la calidad del servicio</p>
           </div>
         </div>
