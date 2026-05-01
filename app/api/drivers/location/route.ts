@@ -49,10 +49,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(location);
   } catch (error) {
     console.error('Error fetching driver location:', error);
-    return NextResponse.json(
-      { message: 'Error al obtener ubicación' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al obtener ubicación' }, { status: 500 });
   }
 }
 
@@ -97,18 +94,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (!location) {
-      return NextResponse.json(
-        { message: 'Conductor no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: 'Conductor no encontrado' }, { status: 404 });
     }
 
     return NextResponse.json(location);
   } catch (error) {
     console.error('Error updating location:', error);
-    return NextResponse.json(
-      { message: 'Error al actualizar ubicación' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al actualizar ubicación' }, { status: 500 });
   }
 }

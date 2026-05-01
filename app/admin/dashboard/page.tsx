@@ -5,7 +5,16 @@ import { Container } from '@/components/layouts/container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, TrendingUp, DollarSign, Trash2, UserCircle, Phone, Mail, Calendar } from 'lucide-react';
+import {
+  Users,
+  TrendingUp,
+  DollarSign,
+  Trash2,
+  UserCircle,
+  Phone,
+  Mail,
+  Calendar,
+} from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
@@ -77,18 +86,13 @@ export default function AdminDashboard() {
       // Calculate metrics
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const todaysRides = ridesData.filter(
-        (r: Ride) => new Date(r.createdAt) >= today
-      ).length;
+      const todaysRides = ridesData.filter((r: Ride) => new Date(r.createdAt) >= today).length;
       setTotalRides(todaysRides);
 
       const active = driversData.filter((d: Driver) => d.status === 'online').length;
       setActiveDrivers(active);
 
-      const revenue = ridesData.reduce(
-        (sum: number, ride: Ride) => sum + (ride.fare || 0),
-        0
-      );
+      const revenue = ridesData.reduce((sum: number, ride: Ride) => sum + (ride.fare || 0), 0);
       setTotalRevenue(revenue);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -235,17 +239,19 @@ export default function AdminDashboard() {
                               ride.status === 'COMPLETED'
                                 ? 'bg-green-500/15 text-green-400 border-green-500/30'
                                 : ride.status === 'IN_PROGRESS'
-                                ? 'bg-blue-500/15 text-blue-400 border-blue-500/30'
-                                : ride.status === 'ACCEPTED'
-                                ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30'
-                                : 'bg-muted text-muted-foreground border-border'
+                                  ? 'bg-blue-500/15 text-blue-400 border-blue-500/30'
+                                  : ride.status === 'ACCEPTED'
+                                    ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30'
+                                    : 'bg-muted text-muted-foreground border-border'
                             }`}
                           >
                             {ride.status}
                           </Badge>
                         </TableCell>
                         <TableCell>${ride.fare?.toFixed(2) || 'N/A'}</TableCell>
-                        <TableCell className="text-sm">{ride.driver?.name || 'Sin asignar'}</TableCell>
+                        <TableCell className="text-sm">
+                          {ride.driver?.name || 'Sin asignar'}
+                        </TableCell>
                         <TableCell className="text-sm">
                           {new Date(ride.createdAt).toLocaleDateString('es-MX')}
                         </TableCell>
@@ -384,7 +390,9 @@ export default function AdminDashboard() {
                 {/* Mobile: Cards */}
                 <div className="md:hidden space-y-3">
                   {clients.length === 0 && (
-                    <p className="text-center text-muted-foreground py-8">No hay clientes registrados</p>
+                    <p className="text-center text-muted-foreground py-8">
+                      No hay clientes registrados
+                    </p>
                   )}
                   {clients.map((client) => (
                     <div key={client.id} className="glass-card rounded-xl p-4 space-y-3">
@@ -501,7 +509,8 @@ export default function AdminDashboard() {
             {confirmType === 'driver' && selectedDriver && (
               <>
                 <p className="text-muted-foreground mb-4">
-                  ¿Estás seguro de que deseas eliminar al conductor <strong>{selectedDriver.user.name}</strong>? Esta acción no se puede deshacer.
+                  ¿Estás seguro de que deseas eliminar al conductor{' '}
+                  <strong>{selectedDriver.user.name}</strong>? Esta acción no se puede deshacer.
                 </p>
                 <div className="text-sm text-muted-foreground mb-6">
                   Se eliminarán:
@@ -517,7 +526,8 @@ export default function AdminDashboard() {
             {confirmType === 'client' && selectedClient && (
               <>
                 <p className="text-muted-foreground mb-4">
-                  ¿Estás seguro de que deseas eliminar al cliente <strong>{selectedClient.name}</strong>? Esta acción no se puede deshacer.
+                  ¿Estás seguro de que deseas eliminar al cliente{' '}
+                  <strong>{selectedClient.name}</strong>? Esta acción no se puede deshacer.
                 </p>
                 <div className="text-sm text-muted-foreground mb-6">
                   Se eliminarán:
@@ -547,7 +557,11 @@ export default function AdminDashboard() {
                 onClick={confirmType === 'driver' ? handleDeleteDriver : handleDeleteClient}
                 disabled={deletingId !== null}
               >
-                {deletingId ? 'Eliminando...' : confirmType === 'driver' ? 'Eliminar Conductor' : 'Eliminar Cliente'}
+                {deletingId
+                  ? 'Eliminando...'
+                  : confirmType === 'driver'
+                    ? 'Eliminar Conductor'
+                    : 'Eliminar Cliente'}
               </Button>
             </div>
           </div>

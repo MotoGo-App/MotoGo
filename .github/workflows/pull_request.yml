@@ -1,39 +1,108 @@
-name: CI Pipeline
+name: PR Checks
+
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-and-check:
-    name: Lint, Type Check & Build
+  lint:
+    name: Lint & Format
     runs-on: ubuntu-latest
-
     steps:
-      - name: 📥 Clonar el repositorio
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: ⚙️ Configurar Node.js
+      - name: Setup Node.js 22.13
         uses: actions/setup-node@v4
         with:
-          node-version: '22.13.0' # Una versión moderna y estable
-          cache: 'yarn'      # Hace que las siguientes veces sea más rápido
+          node-version: '22.13'
+          cache: 'yarn'
 
-      - name: 📦 Instalar dependencias
+      - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: 🗄️ Generar Prisma Client
-        #Si no generamos Prisma aquí, el build fallará 
-        run: yarn prisma generate 
+      - name: Generate Prisma client
+        run: yarn prisma generate
 
-      - name: 🔍 Chequeo de Tipos (TypeScript)
-        run: yarn type-check
-
-      - name: 🧹 Linting (ESLint)
+      - name: Run ESLint
         run: yarn lint
 
-      - name: 🚀 Construir aplicación (Build)
+      - name: Check Prettier formatting
+        run: yarn format:check
+
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22.13
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.13'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run TypeScript compiler
+        run: yarn type-check
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22.13
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.13'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests with coverage
+        run: yarn test:coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, type-check, test]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22.13
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.13'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: yarn prisma generate
+
+      - name: Build Next.js app
         run: yarn build
         env:
-          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
-          NEXTAUTH_SECRET: "dummy-secret-for-ci-build-only"
-          NEXTAUTH_URL: "http://localhost:3000"
+          DATABASE_URL: 'postgresql://dummy:dummy@localhost:5432/dummy'
+          NEXTAUTH_SECRET: 'dummy-secret-for-ci-build-only'
+          NEXTAUTH_URL: 'http://localhost:3000'

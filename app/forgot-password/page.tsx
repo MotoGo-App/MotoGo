@@ -47,7 +47,11 @@ export default function ForgotPasswordPage() {
   return (
     <AuthLayout
       title={sent ? '¡Correo enviado!' : 'Recuperar contraseña'}
-      description={sent ? 'Revisa tu bandeja de entrada' : 'Te enviaremos un enlace para restablecer tu contraseña'}
+      description={
+        sent
+          ? 'Revisa tu bandeja de entrada'
+          : 'Te enviaremos un enlace para restablecer tu contraseña'
+      }
     >
       {sent ? (
         <div className="space-y-4">
@@ -56,7 +60,8 @@ export default function ForgotPasswordPage() {
               <Mail className="w-8 h-8 text-primary" />
             </div>
             <p className="text-sm text-muted-foreground">
-              Si <strong className="text-foreground">{email}</strong> está registrado, recibirás un enlace para restablecer tu contraseña.
+              Si <strong className="text-foreground">{email}</strong> está registrado, recibirás un
+              enlace para restablecer tu contraseña.
             </p>
             <p className="text-xs text-muted-foreground mt-2">
               El enlace expira en 1 hora. Revisa también tu carpeta de spam.
@@ -64,7 +69,10 @@ export default function ForgotPasswordPage() {
           </div>
 
           <Button
-            onClick={() => { setSent(false); setEmail(''); }}
+            onClick={() => {
+              setSent(false);
+              setEmail('');
+            }}
             variant="outline"
             className="w-full h-11 rounded-xl border-border/50 hover:bg-secondary/50"
           >
@@ -84,7 +92,9 @@ export default function ForgotPasswordPage() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-muted-foreground text-sm">Correo electrónico</Label>
+            <Label htmlFor="email" className="text-muted-foreground text-sm">
+              Correo electrónico
+            </Label>
             <div className="relative">
               <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
               <Input

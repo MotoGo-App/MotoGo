@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { cn } from '@/lib/utils'
-import { PanelLeft } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
+import { PanelLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function AppShell({
   sidebar,
@@ -11,12 +11,12 @@ export function AppShell({
   children,
   className,
 }: {
-  sidebar: React.ReactNode
-  header?: React.ReactNode
-  children: React.ReactNode
-  className?: string
+  sidebar: React.ReactNode;
+  header?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
@@ -35,9 +35,7 @@ export function AppShell({
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <div className="flex h-full flex-col overflow-y-auto p-4">
-          {sidebar}
-        </div>
+        <div className="flex h-full flex-col overflow-y-auto p-4">{sidebar}</div>
       </aside>
 
       {/* Main area */}
@@ -56,10 +54,8 @@ export function AppShell({
         </header>
 
         {/* Content */}
-        <main className={cn('p-4 sm:p-6 lg:p-8', className)}>
-          {children}
-        </main>
+        <main className={cn('p-4 sm:p-6 lg:p-8', className)}>{children}</main>
       </div>
     </div>
-  )
+  );
 }

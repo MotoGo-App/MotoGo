@@ -1,12 +1,11 @@
-import {validateBody} from "@/lib/http";
-
-export const dynamic = 'force-dynamic';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
-import { ratingSchema} from "./schema";
+import { validateBody } from '@/lib/http';
+import { ratingSchema } from './schema';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -33,10 +32,7 @@ export async function POST(request: NextRequest) {
     );
 
     if (existingRating) {
-      return NextResponse.json(
-        { message: 'Ya has calificado este viaje' },
-        { status: 409 }
-      );
+      return NextResponse.json({ message: 'Ya has calificado este viaje' }, { status: 409 });
     }
 
     const rating = await withRetry(() =>
@@ -86,9 +82,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(rating, { status: 201 });
   } catch (error) {
     console.error('Error creating rating:', error);
-    return NextResponse.json(
-      { message: 'Error al crear la calificación' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al crear la calificación' }, { status: 500 });
   }
 }

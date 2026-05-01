@@ -85,9 +85,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(accepted.ride, { status: 200 });
   } catch (error) {
     console.error('Error accepting ride:', error);
-    return NextResponse.json(
-      { message: 'Error al aceptar el viaje' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al aceptar el viaje' }, { status: 500 });
   }
 }

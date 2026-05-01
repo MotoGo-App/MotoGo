@@ -56,9 +56,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(drivers);
   } catch (error) {
     console.error('Error fetching drivers:', error);
-    return NextResponse.json(
-      { message: 'Error al obtener conductores' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al obtener conductores' }, { status: 500 });
   }
 }

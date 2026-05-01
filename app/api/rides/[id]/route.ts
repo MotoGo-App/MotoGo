@@ -5,10 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -32,10 +29,7 @@ export async function GET(
   return NextResponse.json(ride);
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -59,9 +53,6 @@ export async function PATCH(
     return NextResponse.json(ride);
   } catch (error) {
     console.error('Error updating ride:', error);
-    return NextResponse.json(
-      { message: 'Error al actualizar el viaje' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error al actualizar el viaje' }, { status: 500 });
   }
 }

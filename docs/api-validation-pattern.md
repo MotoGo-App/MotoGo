@@ -10,25 +10,25 @@ Every API route that accepts a request body **must** validate it with Zod before
 
 ## The three files
 
-| File | Purpose |
-|---|---|
-| `lib/http.ts` | Already exists. `validateBody<T>()` helper. Don't modify unless you know exactly why. |
-| `app/api/<feature>/schema.ts` | One per route. Zod schema + inferred type. |
-| `app/api/<feature>/route.ts` | Calls `validateBody` at the top, narrows, proceeds with typed data. |
+| File                          | Purpose                                                                               |
+| ----------------------------- | ------------------------------------------------------------------------------------- |
+| `lib/http.ts`                 | Already exists. `validateBody<T>()` helper. Don't modify unless you know exactly why. |
+| `app/api/<feature>/schema.ts` | One per route. Zod schema + inferred type.                                            |
+| `app/api/<feature>/route.ts`  | Calls `validateBody` at the top, narrows, proceeds with typed data.                   |
 
 ## Step by step
 
 ### 1. Create `schema.ts` next to the route
 
 ```ts
-import { z } from "zod";
+import { z } from 'zod';
 
 export const createFooSchema = z.object({
   someId: z.string().min(1),
-  count: z.number().int().min(0),          // .int() when Prisma column is Int
+  count: z.number().int().min(0), // .int() when Prisma column is Int
   title: z.string().trim().min(1).max(200),
   note: z.string().trim().max(500).optional(),
-  active: z.boolean(),                      // strict boolean, no coercion
+  active: z.boolean(), // strict boolean, no coercion
 });
 
 export type CreateFooInput = z.infer<typeof createFooSchema>;
@@ -51,20 +51,20 @@ export type CreateFooInput = z.infer<typeof createFooSchema>;
 ### 2. Wire it into `route.ts`
 
 ```ts
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { validateBody } from "@/lib/http";   // no .ts extension
-import { createFooSchema } from "./schema";
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { validateBody } from '@/lib/http'; // no .ts extension
+import { createFooSchema } from './schema';
 // ...other imports grouped here, at the top
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   // 1. Auth check first
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    return NextResponse.json({ message: "No autenticado" }, { status: 401 });
+    return NextResponse.json({ message: 'No autenticado' }, { status: 401 });
   }
 
   // 2. Validate body
@@ -110,17 +110,17 @@ The three responses tell you the three code paths work.
 
 ## Common mistakes — don't do these
 
-| Mistake | Why it's wrong |
-|---|---|
-| `validation.data as CreateFooInput` | `data` is already typed. `as` hides bugs — delete the cast. |
-| `if (validation instanceof Ok)` | `Ok` is a type, not a class. Use `if (validation.ok)`. |
-| `import { validateBody } from "@/lib/http.ts"` | Drop the `.ts`. Matches the rest of the codebase. |
-| Imports split across the file | All imports at the top. No imports after `export const dynamic`. |
-| Forgetting `.int()` on integer fields | `3.7` slips through; Prisma crashes with 500 instead of returning 400. |
-| `z.string()` without `.max()` | Clients can post 10MB strings. Always bound input. |
-| `z.coerce.boolean()` | `"false"` coerces to `true` (truthy string). Strict `z.boolean()` is safer. |
-| Forgetting `export` on the schema | Route can't import it. TS will tell you. |
-| Fixing unrelated issues in the same PR | One concern per PR. Note the issue, open a follow-up. |
+| Mistake                                        | Why it's wrong                                                              |
+| ---------------------------------------------- | --------------------------------------------------------------------------- |
+| `validation.data as CreateFooInput`            | `data` is already typed. `as` hides bugs — delete the cast.                 |
+| `if (validation instanceof Ok)`                | `Ok` is a type, not a class. Use `if (validation.ok)`.                      |
+| `import { validateBody } from "@/lib/http.ts"` | Drop the `.ts`. Matches the rest of the codebase.                           |
+| Imports split across the file                  | All imports at the top. No imports after `export const dynamic`.            |
+| Forgetting `.int()` on integer fields          | `3.7` slips through; Prisma crashes with 500 instead of returning 400.      |
+| `z.string()` without `.max()`                  | Clients can post 10MB strings. Always bound input.                          |
+| `z.coerce.boolean()`                           | `"false"` coerces to `true` (truthy string). Strict `z.boolean()` is safer. |
+| Forgetting `export` on the schema              | Route can't import it. TS will tell you.                                    |
+| Fixing unrelated issues in the same PR         | One concern per PR. Note the issue, open a follow-up.                       |
 
 ## Hover tip
 

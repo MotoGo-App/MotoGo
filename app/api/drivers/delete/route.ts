@@ -42,20 +42,14 @@ export async function POST(request: NextRequest) {
     // 1. Delete all ratings related to this driver
     await prisma.rating.deleteMany({
       where: {
-        OR: [
-          { toUserId: driver.userId },
-          { fromUserId: driver.userId },
-        ],
+        OR: [{ toUserId: driver.userId }, { fromUserId: driver.userId }],
       },
     });
 
     // 2. Delete all rides where this driver is involved
     await prisma.ride.deleteMany({
       where: {
-        OR: [
-          { driverId: driverId },
-          { clientId: driver.userId },
-        ],
+        OR: [{ driverId: driverId }, { clientId: driver.userId }],
       },
     });
 
@@ -99,9 +93,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error al eliminar conductor:', error);
-    return NextResponse.json(
-      { error: 'Error al eliminar conductor' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error al eliminar conductor' }, { status: 500 });
   }
 }

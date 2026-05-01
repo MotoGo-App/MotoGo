@@ -8,7 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Mail, Lock, User, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
@@ -134,7 +140,9 @@ export default function SignupPage() {
         )}
 
         <div>
-          <Label htmlFor="name" className="text-muted-foreground text-sm">Nombre Completo</Label>
+          <Label htmlFor="name" className="text-muted-foreground text-sm">
+            Nombre Completo
+          </Label>
           <div className="relative mt-1.5">
             <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
             <Input
@@ -150,7 +158,9 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <Label htmlFor="email" className="text-muted-foreground text-sm">Correo Electrónico</Label>
+          <Label htmlFor="email" className="text-muted-foreground text-sm">
+            Correo Electrónico
+          </Label>
           <div className="relative mt-1.5">
             <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
             <Input
@@ -166,8 +176,13 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <Label htmlFor="role" className="text-muted-foreground text-sm">Tipo de Cuenta</Label>
-          <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
+          <Label htmlFor="role" className="text-muted-foreground text-sm">
+            Tipo de Cuenta
+          </Label>
+          <Select
+            value={formData.role}
+            onValueChange={(value) => setFormData({ ...formData, role: value })}
+          >
             <SelectTrigger className="mt-1.5 bg-secondary/50 border-border/50 text-foreground rounded-xl h-11">
               <SelectValue />
             </SelectTrigger>
@@ -179,7 +194,9 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <Label htmlFor="password" className="text-muted-foreground text-sm">Contraseña</Label>
+          <Label htmlFor="password" className="text-muted-foreground text-sm">
+            Contraseña
+          </Label>
           <div className="relative mt-1.5">
             <Lock
               className={`absolute left-3 top-3 w-4 h-4 ${
@@ -213,7 +230,9 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <Label htmlFor="confirmPassword" className="text-muted-foreground text-sm">Confirmar Contraseña</Label>
+          <Label htmlFor="confirmPassword" className="text-muted-foreground text-sm">
+            Confirmar Contraseña
+          </Label>
           <div className="relative mt-1.5">
             <Lock
               className={`absolute left-3 top-3 w-4 h-4 ${
@@ -279,8 +298,8 @@ export default function SignupPage() {
               className="text-primary hover:underline font-medium"
             >
               Aviso de Privacidad
-            </Link>
-            {' '}y doy mi consentimiento para el tratamiento de mis datos personales.
+            </Link>{' '}
+            y doy mi consentimiento para el tratamiento de mis datos personales.
           </Label>
         </div>
 
