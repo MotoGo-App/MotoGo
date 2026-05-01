@@ -21,7 +21,7 @@ vi.mock('@/lib/auth', () => ({
 
 vi.mock('@/lib/db', () => ({
   prisma: mockPrisma,
-  withRetry: <T,>(fn: () => Promise<T>): Promise<T> => fn(),
+  withRetry: <T>(fn: () => Promise<T>): Promise<T> => fn(),
 }));
 
 const { POST } = await import('@/app/api/drivers/accept-ride/route');
@@ -107,14 +107,11 @@ describe('POST /api/drivers/accept-ride', () => {
     });
 
     it('returns 400 when the body is not valid JSON', async () => {
-      const req = new Request(
-        'http://localhost/api/drivers/accept-ride',
-        {
-          method: 'POST',
-          body: 'not-json{',
-          headers: { 'Content-Type': 'application/json' },
-        }
-      ) as unknown as NextRequest;
+      const req = new Request('http://localhost/api/drivers/accept-ride', {
+        method: 'POST',
+        body: 'not-json{',
+        headers: { 'Content-Type': 'application/json' },
+      }) as unknown as NextRequest;
 
       const response = await POST(req);
 
@@ -228,10 +225,10 @@ describe('POST /api/drivers/accept-ride', () => {
     });
 
     it('returns 409 when another driver wins the race and the update returns P2025', async () => {
-      const p2025 = new Prisma.PrismaClientKnownRequestError(
-        'Record to update not found',
-        { code: 'P2025', clientVersion: '6.7.0' }
-      );
+      const p2025 = new Prisma.PrismaClientKnownRequestError('Record to update not found', {
+        code: 'P2025',
+        clientVersion: '6.7.0',
+      });
       mockPrisma.ride.update.mockRejectedValueOnce(p2025);
 
       const response = await POST(makeRequest({ rideId: RIDE_ID }));

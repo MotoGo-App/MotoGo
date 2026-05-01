@@ -26,9 +26,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const accepted = await prisma.$transaction(async (tx) => {
-      const driver = await withRetry(() =>
-        tx.driver.findUnique({ where: { userId: driverId } })
-      );
+      const driver = await withRetry(() => tx.driver.findUnique({ where: { userId: driverId } }));
 
       if (!driver || driver.status !== 'online') {
         return { ok: false as const, reason: 'DRIVER_OFFLINE' as const };
@@ -53,10 +51,7 @@ export async function POST(request: NextRequest) {
 
         return { ok: true as const, ride: updated };
       } catch (e) {
-        if (
-          e instanceof Prisma.PrismaClientKnownRequestError &&
-          e.code === 'P2025'
-        ) {
+        if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
           return { ok: false as const, reason: 'ALREADY_TAKEN' as const };
         }
         throw e;
@@ -65,10 +60,7 @@ export async function POST(request: NextRequest) {
 
     if (!accepted.ok) {
       if (accepted.reason === 'NOT_FOUND') {
-        return NextResponse.json(
-          { message: 'Viaje no encontrado' },
-          { status: 404 }
-        );
+        return NextResponse.json({ message: 'Viaje no encontrado' }, { status: 404 });
       }
       if (accepted.reason === 'DRIVER_OFFLINE') {
         return NextResponse.json(
@@ -76,10 +68,7 @@ export async function POST(request: NextRequest) {
           { status: 403 }
         );
       }
-      return NextResponse.json(
-        { message: 'Este viaje ya fue aceptado' },
-        { status: 409 }
-      );
+      return NextResponse.json({ message: 'Este viaje ya fue aceptado' }, { status: 409 });
     }
 
     return NextResponse.json(accepted.ride, { status: 200 });
