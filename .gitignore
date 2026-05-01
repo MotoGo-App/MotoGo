@@ -3,3 +3,5 @@ node_modules
 tsconfig.tsbuildinfo
 *.tsbuildinfo
 .env
+
+.env.sentry-build-plugin
