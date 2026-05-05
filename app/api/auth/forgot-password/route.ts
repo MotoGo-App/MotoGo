@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma, withRetry } from '@/lib/db';
 import crypto from 'crypto';
+import { sendForgotPasswordEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,33 +77,21 @@ export async function POST(request: NextRequest) {
     `;
 
     try {
-      const appName = 'MotoGo';
-      const senderDomain = appUrl ? new URL(appUrl).hostname : 'motogo.lat';
+      await sendForgotPasswordEmail(user.email, htmlBody);
 
-      await fetch('https://apps.abacus.ai/api/sendNotificationEmail', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          deployment_token: process.env.ABACUSAI_API_KEY,
-          app_id: process.env.WEB_APP_ID,
-          notification_id: process.env.NOTIF_ID_RECUPERACIN_DE_CONTRASEA,
-          subject: 'Restablecer contraseña - MotoGo',
-          body: htmlBody,
-          is_html: true,
-          recipient_email: user.email,
-          sender_email: `noreply@${senderDomain}`,
-          sender_alias: appName,
-        }),
+      return NextResponse.json({
+        success: true,
+        message: 'Si el correo existe, recibirás un enlace de recuperación.',
       });
     } catch (emailError) {
-      console.error('Error sending password reset email:', emailError);
-      // Don't fail the request if email fails
-    }
+      console.error('Email service failure:', emailError);
 
-    return NextResponse.json({
-      success: true,
-      message: 'Si el correo existe, recibirás un enlace de recuperación.',
-    });
+      // Respondemos con error para que la UI pueda manejarlo (ej. mostrar un toast)
+      return NextResponse.json(
+        { message: 'El servicio de correo no está disponible. Intenta más tarde.' },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error('Error in forgot-password:', error);
     return NextResponse.json({ message: 'Error al procesar la solicitud' }, { status: 500 });
