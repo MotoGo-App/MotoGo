@@ -6,35 +6,31 @@ describe('Email Service (lib/email.ts)', () => {
     vi.resetAllMocks();
   });
 
-  it('debe lanzar un error si las variables de entorno de Abacus no están configuradas', async () => {
-    // Simulamos que la API KEY está vacía
+  it('should throw an error if Abacus environment variables are not set', async () => {
     vi.stubEnv('ABACUSAI_API_KEY', '');
 
     await expect(sendForgotPasswordEmail('test@example.com', '<h1>HTML</h1>')).rejects.toThrow();
   });
 
-  it('debe lanzar un error si la respuesta de Abacus AI no es exitosa (status != 200)', async () => {
-    // Configuramos el mock para que devuelva un error 500 y un JSON específico
+  it('should throw an error if the response from Abacus AI is not successful (status != 200)', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 500,
       json: () => Promise.resolve({ message: 'Error interno de Abacus' }),
     });
 
-    // Usamos una expresión regular para que el test pase si el error contiene la palabra "Abacus"
     await expect(sendForgotPasswordEmail('test@example.com', '<body>Test</body>')).rejects.toThrow(
       /Abacus/
     );
   });
 
-  it('debe funcionar correctamente cuando la API responde con éxito', async () => {
-    // Simulamos una respuesta exitosa
+  it('should work correctly when the API responds successfully', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
     });
 
-    const result = await sendForgotPasswordEmail('test@example.com', '<body>Exito</body>');
+    const result = await sendForgotPasswordEmail('test@example.com', '<body>Success</body>');
     expect(result).toBe(true);
   });
 });
