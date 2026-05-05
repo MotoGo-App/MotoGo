@@ -1,12 +1,11 @@
-import { validateBody } from '@/lib/http';
-
-export const dynamic = 'force-dynamic';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
+import { validateBody } from '@/lib/http';
 import { ratingSchema } from './schema';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
