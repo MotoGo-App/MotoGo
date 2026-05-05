@@ -14,11 +14,11 @@ If this PR is not tied to a tracked story (e.g., a quick fix), explain why here.
 
 ## Changes
 
-- 
+-
 
 ## Test plan
 
-- [ ] 
+- [ ]
 
 ## Definition of Done
 
