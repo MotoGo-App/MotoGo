@@ -281,3 +281,13 @@ model Session {
 
   @@index([userId])
 }
+
+model AuthAttempt {
+  id                   String   @id @default(cuid())
+  identifier           String
+  endpoint             String
+  success              Boolean  @default(false)
+  createdAt            DateTime @default(now())
+
+  @@index([identifier, createdAt])
+}

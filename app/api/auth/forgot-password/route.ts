@@ -3,6 +3,8 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma, withRetry } from '@/lib/db';
 import crypto from 'crypto';
+// Importamos las utilidades de seguridad
+import { calculateThrottlingDelay, sleep } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,13 +14,35 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Email requerido' }, { status: 400 });
     }
 
+    const identifier = email.toLowerCase().trim();
+
+    // 1. S2.4 - Consultar intentos previos para este email en este endpoint
+    const recentFailures = await prisma.authAttempt.count({
+      where: {
+        identifier,
+        endpoint: 'forgot-password',
+        createdAt: { gte: new Date(Date.now() - 15 * 60 * 1000) }, // Últimos 15 min
+      },
+    });
+
+    // 2. S2.4 - Aplicar el "freno" progresivo (Throttling)
+    const delay = calculateThrottlingDelay(recentFailures);
+    if (delay > 0) {
+      await sleep(delay);
+    }
+
     // Find user by email
     const user = await withRetry(async () => {
-      return prisma.user.findUnique({ where: { email: email.toLowerCase().trim() } });
+      return prisma.user.findUnique({ where: { email: identifier } });
     });
 
     // Always return success to prevent email enumeration
     if (!user) {
+      // S2.4 - Registramos el intento aunque el usuario no exista para controlar el spam
+      await prisma.authAttempt.create({
+        data: { identifier, endpoint: 'forgot-password', success: false },
+      });
+
       return NextResponse.json({
         success: true,
         message: 'Si el correo existe, recibirás un enlace de recuperación.',
@@ -94,8 +118,17 @@ export async function POST(request: NextRequest) {
           sender_alias: appName,
         }),
       });
+
+      // S2.4 - Registro de éxito en el envío
+      await prisma.authAttempt.create({
+        data: { identifier, endpoint: 'forgot-password', success: true },
+      });
     } catch (emailError) {
       console.error('Error sending password reset email:', emailError);
+      // S2.4 - Si falla el servicio de email, lo contamos como fallo de seguridad
+      await prisma.authAttempt.create({
+        data: { identifier, endpoint: 'forgot-password', success: false },
+      });
       // Don't fail the request if email fails
     }
 
