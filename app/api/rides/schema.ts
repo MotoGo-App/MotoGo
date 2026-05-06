@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 export const ridesSchema = z.object({
-  origin: z.string().min(1, { message: 'Origin is required' }),
-  destination: z.string().min(1, { message: 'Destination is required' }),
-  originLat: z.number().min(-90).max(90).optional(),
-  originLng: z.number().min(-180).max(180).optional(),
-  destLat: z.number().min(-90).max(90).optional(),
-  destLng: z.number().min(-180).max(180).optional(),
+  originAddress: z.string().min(1, { message: 'Origin address is required' }),
+  originLatitude: z.number().min(-90).max(90, { message: 'Invalid origin latitude' }),
+  originLongitude: z.number().min(-180).max(180, { message: 'Invalid origin longitude' }),
+  destinationAddress: z.string().min(1, { message: 'Destination address is required' }),
+  destinationLatitude: z.number().min(-90).max(90, { message: 'Invalid destination latitude' }),
+  destinationLongitude: z.number().min(-180).max(180, { message: 'Invalid destination longitude' }),
 });

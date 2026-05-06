@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
+import { paymentSchema } from './schema';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -36,7 +37,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { rideId, amount, type } = await request.json();
+    const body = await request.json();
+    const result = paymentSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+    }
+    const { rideId, amount, type } = result.data;
 
     let paymentIntent: any = null;
     let stripePaymentIntentId: string | undefined = undefined;

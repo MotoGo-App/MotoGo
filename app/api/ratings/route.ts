@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
-import { validateBody } from '@/lib/http';
 import { ratingSchema } from './schema';
 
 export const dynamic = 'force-dynamic';
@@ -15,13 +14,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const validation = await validateBody(request, ratingSchema);
-
-    if (!validation.ok) {
-      return validation.response;
+    const body = await request.json();
+    const result = ratingSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
     }
-
-    const { rideId, toUserId, stars, comment, isClientRating } = validation.data;
+    const { rideId, toUserId, stars, comment, isClientRating } = result.data;
     const existingRating = await withRetry(() =>
       prisma.rating.findFirst({
         where: {

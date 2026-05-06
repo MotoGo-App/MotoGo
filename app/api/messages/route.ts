@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
+import { messageSchema } from './schema';
 
 // GET: Fetch messages for a ride
 export async function GET(request: NextRequest) {
@@ -59,11 +60,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { rideId, content } = await request.json();
-
-    if (!rideId || !content?.trim()) {
-      return NextResponse.json({ message: 'rideId y contenido requeridos' }, { status: 400 });
+    const body = await request.json();
+    const result = messageSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
     }
+    const { rideId, content } = result.data;
 
     // Verify user is part of this ride
     const ride = await withRetry(() => prisma.ride.findUnique({ where: { id: rideId } }));

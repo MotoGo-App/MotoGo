@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import { Prisma, RideStatus } from '@prisma/client';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
-import { validateBody } from '@/lib/http';
 import { acceptRideSchema } from './schema';
 
 export const dynamic = 'force-dynamic';
@@ -16,13 +15,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'No autenticado' }, { status: 401 });
   }
 
-  const validation = await validateBody(request, acceptRideSchema);
-
-  if (!validation.ok) {
-    return validation.response;
+  const body = await request.json();
+  const result = acceptRideSchema.safeParse(body);
+  if (!result.success) {
+    return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
   }
-
-  const { rideId } = validation.data;
+  const { rideId } = result.data;
 
   try {
     const accepted = await prisma.$transaction(async (tx) => {

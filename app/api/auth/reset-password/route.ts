@@ -2,22 +2,19 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma, withRetry } from '@/lib/db';
+import { resetPasswordSchema } from './schema';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
   try {
-    const { token, password } = await request.json();
+    const body = await request.json();
+    const result = resetPasswordSchema.safeParse(body);
 
-    if (!token || !password) {
-      return NextResponse.json({ message: 'Token y contraseña son requeridos' }, { status: 400 });
+    if (!result.success) {
+      return NextResponse.json({ message: 'Token o contraseña inválidos' }, { status: 400 });
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { message: 'La contraseña debe tener al menos 6 caracteres' },
-        { status: 400 }
-      );
-    }
+    const { token, newPassword } = result.data;
 
     // Find valid token
     const resetToken = await withRetry(async () => {
@@ -43,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash new password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
 
     // Update password and mark token as used
     await withRetry(async () => {

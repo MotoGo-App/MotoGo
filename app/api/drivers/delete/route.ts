@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { deleteDriverSchema } from './schema';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,11 +23,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
     }
 
-    // Get driver ID from request body
-    const { driverId } = await request.json();
-    if (!driverId) {
-      return NextResponse.json({ error: 'driverId requerido' }, { status: 400 });
+    const body = await request.json();
+    const result = deleteDriverSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 });
     }
+    const { id: driverId } = result.data;
 
     // Find the driver
     const driver = await prisma.driver.findUnique({

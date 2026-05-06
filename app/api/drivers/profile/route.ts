@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { profileDriverSchema } from './schema';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -44,6 +45,11 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
+    const body = await request.json();
+    const result = profileDriverSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+    }
     const {
       age,
       drivingExperienceYears,
@@ -54,7 +60,7 @@ export async function PATCH(request: NextRequest) {
       licenseNumber,
       vehiclePlate,
       name,
-    } = await request.json();
+    } = result.data;
 
     const driver = await prisma.driver.findUnique({
       where: { userId: session.user.id },

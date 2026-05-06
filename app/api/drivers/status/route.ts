@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
+import { statusDriverSchema } from './schema';
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -13,7 +14,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { isOnline } = await request.json();
+    const body = await request.json();
+    const result = statusDriverSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+    }
+    const { isOnline } = result.data;
 
     const driver = await withRetry(() =>
       prisma.driver.findUnique({

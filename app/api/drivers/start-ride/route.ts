@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
+import { startRideSchema } from './schema';
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -13,7 +14,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { rideId } = await request.json();
+    const body = await request.json();
+    const result = startRideSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+    }
+    const { rideId } = result.data;
 
     // Verify ride exists, belongs to this driver, and is ACCEPTED
     const existingRide = await withRetry(() => prisma.ride.findUnique({ where: { id: rideId } }));

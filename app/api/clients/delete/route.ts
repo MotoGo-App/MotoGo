@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
+import { deleteClientSchema } from './schema';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,10 +21,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
     }
 
-    const { clientId } = await request.json();
-    if (!clientId) {
-      return NextResponse.json({ error: 'clientId requerido' }, { status: 400 });
+    const body = await request.json();
+    const result = deleteClientSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 });
     }
+    const { id: clientId } = result.data;
 
     const client = await withRetry(() => prisma.user.findUnique({ where: { id: clientId } }));
 

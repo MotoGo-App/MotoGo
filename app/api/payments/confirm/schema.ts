@@ -1,5 +1,5 @@
 import { z } from 'zod';
 
 export const confirmPaymentSchema = z.object({
-  rideId: z.string().min(1, { message: 'Ride ID is required' }),
+  paymentIntentId: z.string().min(1, { message: 'Payment intent ID is required' }),
 });
