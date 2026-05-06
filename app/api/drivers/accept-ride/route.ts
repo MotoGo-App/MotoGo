@@ -15,7 +15,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'No autenticado' }, { status: 401 });
   }
 
-  const body = await request.json();
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+  }
   const result = acceptRideSchema.safeParse(body);
   if (!result.success) {
     return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
