@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
 import { cancelRideSchema } from './schema';
+import { handleValidationError } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const result = cancelRideSchema.safeParse(body);
     if (!result.success) {
-      return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+      return handleValidationError(result);
     }
     const { rideId } = result.data;
 

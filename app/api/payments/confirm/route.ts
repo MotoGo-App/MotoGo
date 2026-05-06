@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { confirmPaymentSchema } from './schema';
+import { handleValidationError } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const result = confirmPaymentSchema.safeParse(body);
     if (!result.success) {
-      return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+      return handleValidationError(result);
     }
     const { paymentIntentId } = result.data;
 

@@ -4,6 +4,7 @@ import { Prisma, RideStatus } from '@prisma/client';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
 import { acceptRideSchema } from './schema';
+import { handleValidationError } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,11 +20,11 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+    return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 });
   }
   const result = acceptRideSchema.safeParse(body);
   if (!result.success) {
-    return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+    return handleValidationError(result);
   }
   const { rideId } = result.data;
 

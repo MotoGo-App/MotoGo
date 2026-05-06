@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
 import { ratingSchema } from './schema';
+import { handleValidationError } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const result = ratingSchema.safeParse(body);
     if (!result.success) {
-      return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+      return handleValidationError(result);
     }
     const { rideId, toUserId, stars, comment, isClientRating } = result.data;
     const existingRating = await withRetry(() =>

@@ -1,5 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { SafeParseError } from 'zod';
+import { NextResponse } from 'next/server';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -24,4 +26,14 @@ export function formatCurrency(amount: number, currency = 'MXN'): string {
     style: 'currency',
     currency,
   }).format(amount);
+}
+
+export function handleValidationError(result: SafeParseError<any>) {
+  return NextResponse.json(
+    {
+      message: 'Datos inválidos',
+      errors: result.error.flatten().fieldErrors,
+    },
+    { status: 400 }
+  );
 }

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma, withRetry } from '@/lib/db';
 import { forgotPasswordSchema } from './schema';
 import crypto from 'crypto';
+import { handleValidationError } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +12,7 @@ export async function POST(request: NextRequest) {
     const result = forgotPasswordSchema.safeParse(body);
 
     if (!result.success) {
-      return NextResponse.json({ message: 'Email inválido' }, { status: 400 });
+      return handleValidationError(result);
     }
 
     const { email } = result.data;

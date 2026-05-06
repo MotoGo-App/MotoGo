@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcryptjs from 'bcryptjs';
 import { prisma, withRetry } from '@/lib/db';
 import { signupSchema } from './schema';
+import { handleValidationError } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const result = signupSchema.safeParse(body);
     if (!result.success) {
-      return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+      return handleValidationError(result);
     }
     const { email, password, name, role } = result.data;
 

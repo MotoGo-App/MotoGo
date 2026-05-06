@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { profileDriverSchema } from './schema';
+import { handleValidationError } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -48,7 +49,7 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const result = profileDriverSchema.safeParse(body);
     if (!result.success) {
-      return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+      return handleValidationError(result);
     }
     const {
       age,

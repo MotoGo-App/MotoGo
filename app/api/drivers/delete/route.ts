@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { deleteDriverSchema } from './schema';
+import { handleValidationError } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const result = deleteDriverSchema.safeParse(body);
     if (!result.success) {
-      return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 });
+      return handleValidationError(result);
     }
     const { id: driverId } = result.data;
 

@@ -6,6 +6,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
 import { calculateDistance } from '@/lib/utils';
 import { ridesSchema } from './schema';
+import { handleValidationError } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -154,7 +155,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const result = ridesSchema.safeParse(body);
     if (!result.success) {
-      return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+      return handleValidationError(result);
     }
     const {
       originAddress,

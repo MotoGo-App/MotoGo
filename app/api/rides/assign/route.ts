@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { assignRideSchema } from './schema';
+import { handleValidationError } from '@/lib/utils';
 
 // Auto-asignación deshabilitada.
 // Los conductores ahora aceptan o rechazan viajes manualmente desde su dashboard.
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const result = assignRideSchema.safeParse(body);
   if (!result.success) {
-    return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
+    return handleValidationError(result);
   }
 
   // Ya no se asigna automáticamente — los conductores eligen sus viajes
