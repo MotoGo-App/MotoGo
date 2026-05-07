@@ -6,7 +6,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
 import { calculateDistance } from '@/lib/utils';
 import { ridesSchema } from './schema';
-import { handleValidationError } from '@/lib/utils';
+import { validateBody } from '@/lib/http';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -152,11 +152,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const result = ridesSchema.safeParse(body);
-    if (!result.success) {
-      return handleValidationError(result);
-    }
+    const validation = await validateBody(request, ridesSchema);
+    if (!validation.ok) return validation.response;
     const {
       originAddress,
       originLatitude,
@@ -164,7 +161,7 @@ export async function POST(request: NextRequest) {
       destinationAddress,
       destinationLatitude,
       destinationLongitude,
-    } = result.data;
+    } = validation.data;
 
     // Calcular distancia solo para estimar la duración del viaje
     // No se calcula tarifa: el conductor acuerda el precio con el cliente en persona

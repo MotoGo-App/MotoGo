@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
 import { ratingSchema } from './schema';
-import { handleValidationError } from '@/lib/utils';
+import { validateBody } from '@/lib/http';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,12 +15,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const result = ratingSchema.safeParse(body);
-    if (!result.success) {
-      return handleValidationError(result);
-    }
-    const { rideId, toUserId, stars, comment, isClientRating } = result.data;
+    const validation = await validateBody(request, ratingSchema);
+    if (!validation.ok) return validation.response;
+    const { rideId, toUserId, stars, comment, isClientRating } = validation.data;
     const existingRating = await withRetry(() =>
       prisma.rating.findFirst({
         where: {

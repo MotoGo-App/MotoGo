@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
 import { messageSchema } from './schema';
-import { handleValidationError } from '@/lib/utils';
+import { validateBody } from '@/lib/http';
 
 // GET: Fetch messages for a ride
 export async function GET(request: NextRequest) {
@@ -61,12 +61,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const result = messageSchema.safeParse(body);
-    if (!result.success) {
-      return handleValidationError(result);
-    }
-    const { rideId, content } = result.data;
+    const validation = await validateBody(request, messageSchema);
+    if (!validation.ok) return validation.response;
+    const { rideId, content } = validation.data;
 
     // Verify user is part of this ride
     const ride = await withRetry(() => prisma.ride.findUnique({ where: { id: rideId } }));

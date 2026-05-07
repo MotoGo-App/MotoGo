@@ -4,18 +4,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma, withRetry } from '@/lib/db';
 import { resetPasswordSchema } from './schema';
 import bcrypt from 'bcryptjs';
-import { handleValidationError } from '@/lib/utils';
+import { validateBody } from '@/lib/http';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const result = resetPasswordSchema.safeParse(body);
-
-    if (!result.success) {
-      return handleValidationError(result);
-    }
-
-    const { token, newPassword, email } = result.data;
+    const validation = await validateBody(request, resetPasswordSchema);
+    if (!validation.ok) return validation.response;
+    const { token, newPassword, email } = validation.data;
 
     // Find valid token
     const resetToken = await withRetry(async () => {

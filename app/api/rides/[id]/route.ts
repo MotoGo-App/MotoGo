@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { idRidesSchema } from './schema';
-import { handleValidationError } from '@/lib/utils';
+
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
   const idResult = idRidesSchema.safeParse({ id: params.id });
   if (!idResult.success) {
-    return handleValidationError(idResult);
+    return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
   }
 
   const ride = await prisma.ride.findUnique({
@@ -45,7 +45,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
   const idResult = idRidesSchema.safeParse({ id: params.id });
   if (!idResult.success) {
-    return handleValidationError(idResult);
+    return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
   }
 
   try {

@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
 import { statusDriverSchema } from './schema';
-import { handleValidationError } from '@/lib/utils';
+import { validateBody } from '@/lib/http';
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -15,12 +15,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const result = statusDriverSchema.safeParse(body);
-    if (!result.success) {
-      return handleValidationError(result);
-    }
-    const { isOnline } = result.data;
+    const validation = await validateBody(request, statusDriverSchema);
+    if (!validation.ok) return validation.response;
+    const { isOnline } = validation.data;
 
     const driver = await withRetry(() =>
       prisma.driver.findUnique({

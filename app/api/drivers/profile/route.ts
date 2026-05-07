@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { profileDriverSchema } from './schema';
-import { handleValidationError } from '@/lib/utils';
+import { validateBody } from '@/lib/http';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -46,11 +46,8 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const result = profileDriverSchema.safeParse(body);
-    if (!result.success) {
-      return handleValidationError(result);
-    }
+    const validation = await validateBody(request, profileDriverSchema);
+    if (!validation.ok) return validation.response;
     const {
       age,
       drivingExperienceYears,
@@ -61,7 +58,7 @@ export async function PATCH(request: NextRequest) {
       licenseNumber,
       vehiclePlate,
       name,
-    } = result.data;
+    } = validation.data;
 
     const driver = await prisma.driver.findUnique({
       where: { userId: session.user.id },

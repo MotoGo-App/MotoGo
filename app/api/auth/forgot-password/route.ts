@@ -4,18 +4,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma, withRetry } from '@/lib/db';
 import { forgotPasswordSchema } from './schema';
 import crypto from 'crypto';
-import { handleValidationError } from '@/lib/utils';
+import { validateBody } from '@/lib/http';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const result = forgotPasswordSchema.safeParse(body);
-
-    if (!result.success) {
-      return handleValidationError(result);
-    }
-
-    const { email } = result.data;
+    const validation = await validateBody(request, forgotPasswordSchema);
+    if (!validation.ok) return validation.response;
+    const { email } = validation.data;
 
     // Find user by email
     const user = await withRetry(async () => {

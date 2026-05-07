@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { confirmPaymentSchema } from './schema';
-import { handleValidationError } from '@/lib/utils';
+import { validateBody } from '@/lib/http';
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -15,12 +15,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const result = confirmPaymentSchema.safeParse(body);
-    if (!result.success) {
-      return handleValidationError(result);
-    }
-    const { paymentIntentId } = result.data;
+    const validation = await validateBody(request, confirmPaymentSchema);
+    if (!validation.ok) return validation.response;
+    const { paymentIntentId } = validation.data;
 
     if (!process.env.STRIPE_SECRET_KEY) {
       return NextResponse.json({ message: 'Stripe no configurado' }, { status: 503 });
