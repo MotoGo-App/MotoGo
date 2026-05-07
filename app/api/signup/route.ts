@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcryptjs from 'bcryptjs';
 import { prisma, withRetry } from '@/lib/db';
-// Importamos las utilidades para el Throttling
-import { calculateThrottlingDelay, sleep } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,34 +10,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Faltan campos requeridos' }, { status: 400 });
     }
 
-    const identifier = email.toLowerCase().trim();
-
-    // 1. S2.4 - Consultar intentos de registro recientes (últimos 15 min)
-    const recentFailures = await prisma.authAttempt.count({
-      where: {
-        identifier,
-        endpoint: 'signup',
-        createdAt: { gte: new Date(Date.now() - 15 * 60 * 1000) },
-      },
-    });
-
-    // 2. S2.4 - Aplicar retraso progresivo si se detecta actividad sospechosa
-    const delay = calculateThrottlingDelay(recentFailures);
-    if (delay > 0) {
-      await sleep(delay);
-    }
-
     const existingUser = await withRetry(() =>
       prisma.user.findUnique({
-        where: { email: identifier },
+        where: { email },
       })
     );
 
     if (existingUser) {
-      // S2.4 - Registramos el intento fallido porque el usuario ya existe
-      await prisma.authAttempt.create({
-        data: { identifier, endpoint: 'signup', success: false },
-      });
       return NextResponse.json({ message: 'El usuario ya existe' }, { status: 409 });
     }
 
@@ -48,7 +25,7 @@ export async function POST(request: NextRequest) {
     const user = await withRetry(() =>
       prisma.user.create({
         data: {
-          email: identifier,
+          email,
           password: hashedPassword,
           name,
           role: role || 'CLIENT',
@@ -58,6 +35,7 @@ export async function POST(request: NextRequest) {
 
     // If DRIVER role, create driver profile and free subscription
     if (user.role === 'DRIVER') {
+      // Generate unique temporary values to avoid unique constraint violations
       const uniqueSuffix = `${user.id.slice(0, 8)}-${Date.now()}`;
       const driver = await prisma.driver.create({
         data: {
@@ -68,6 +46,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
+      // Create a free active subscription for the driver
       await prisma.subscription.create({
         data: {
           driverId: driver.id,
@@ -90,23 +69,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 3. S2.4 - Registro de éxito en la creación de cuenta
-    await prisma.authAttempt.create({
-      data: { identifier, endpoint: 'signup', success: true },
-    });
-
     return NextResponse.json({ message: 'Usuario creado exitosamente' }, { status: 201 });
   } catch (error) {
     console.error('Signup error:', error);
-    // S2.4 - Registro de error técnico como intento fallido
-    const { email } = await request
-      .clone()
-      .json()
-      .catch(() => ({ email: 'unknown' }));
-    await prisma.authAttempt.create({
-      data: { identifier: email.toLowerCase(), endpoint: 'signup', success: false },
-    });
-
     return NextResponse.json({ message: 'Error al crear el usuario' }, { status: 500 });
   }
 }
