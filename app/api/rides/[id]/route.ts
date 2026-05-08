@@ -6,7 +6,6 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { idRidesSchema } from './schema';
 
-
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
