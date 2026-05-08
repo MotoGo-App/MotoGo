@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
+import { paymentSchema } from './schema';
+import { validateBody } from '@/lib/http';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -36,7 +38,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { rideId, amount, type } = await request.json();
+    const validation = await validateBody(request, paymentSchema);
+    if (!validation.ok) return validation.response;
+    const { rideId, amount, type } = validation.data;
 
     let paymentIntent: any = null;
     let stripePaymentIntentId: string | undefined = undefined;

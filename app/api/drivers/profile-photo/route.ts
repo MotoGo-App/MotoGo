@@ -5,6 +5,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
 import { generatePresignedUploadUrl, getFileUrl } from '@/lib/s3';
+import { profilePhotoDriverSchema } from './schema';
+import { validateBody } from '@/lib/http';
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -14,23 +16,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { fileName, fileSize, fileType } = await request.json();
-
-    // Validar tipo de archivo
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(fileType)) {
-      return NextResponse.json(
-        { message: 'Tipo de archivo no permitido. Use JPG, PNG o WebP' },
-        { status: 400 }
-      );
-    }
-
-    // Validar tamaño (máximo 5MB)
-    if (fileSize > 5 * 1024 * 1024) {
-      return NextResponse.json(
-        { message: 'El archivo es demasiado grande. Máximo 5MB' },
-        { status: 400 }
-      );
-    }
+    const validation = await validateBody(request, profilePhotoDriverSchema);
+    if (!validation.ok) return validation.response;
+    const { fileName, fileSize, fileType } = validation.data;
 
     const driver = await withRetry(() =>
       prisma.driver.findUnique({

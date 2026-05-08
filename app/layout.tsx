@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
+import './globals.css';
 import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
 import Script from 'next/script';

@@ -4,12 +4,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { idRidesSchema } from './schema';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     return NextResponse.json({ message: 'No autenticado' }, { status: 401 });
+  }
+
+  const idResult = idRidesSchema.safeParse({ id: params.id });
+  if (!idResult.success) {
+    return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
   }
 
   const ride = await prisma.ride.findUnique({
@@ -34,6 +40,11 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
   if (!session?.user?.id) {
     return NextResponse.json({ message: 'No autenticado' }, { status: 401 });
+  }
+
+  const idResult = idRidesSchema.safeParse({ id: params.id });
+  if (!idResult.success) {
+    return NextResponse.json({ message: 'Datos inválidos' }, { status: 400 });
   }
 
   try {

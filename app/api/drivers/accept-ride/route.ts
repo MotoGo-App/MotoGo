@@ -3,8 +3,8 @@ import { getServerSession } from 'next-auth';
 import { Prisma, RideStatus } from '@prisma/client';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
-import { validateBody } from '@/lib/http';
 import { acceptRideSchema } from './schema';
+import { validateBody } from '@/lib/http';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,11 +17,7 @@ export async function POST(request: NextRequest) {
   }
 
   const validation = await validateBody(request, acceptRideSchema);
-
-  if (!validation.ok) {
-    return validation.response;
-  }
-
+  if (!validation.ok) return validation.response;
   const { rideId } = validation.data;
 
   try {

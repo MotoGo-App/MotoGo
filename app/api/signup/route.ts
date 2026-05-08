@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcryptjs from 'bcryptjs';
 import { prisma, withRetry } from '@/lib/db';
+import { signupSchema } from './schema';
+import { validateBody } from '@/lib/http';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name, role } = await request.json();
-
-    if (!email || !password || !name) {
-      return NextResponse.json({ message: 'Faltan campos requeridos' }, { status: 400 });
-    }
+    const validation = await validateBody(request, signupSchema);
+    if (!validation.ok) return validation.response;
+    const { email, password, name, role } = validation.data;
 
     const existingUser = await withRetry(() =>
       prisma.user.findUnique({

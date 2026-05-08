@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
+import { cancelRideSchema } from './schema';
+import { validateBody } from '@/lib/http';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,10 +14,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
     }
 
-    const { rideId } = await request.json();
-    if (!rideId) {
-      return NextResponse.json({ message: 'ID de viaje requerido' }, { status: 400 });
-    }
+    const validation = await validateBody(request, cancelRideSchema);
+    if (!validation.ok) return validation.response;
+    const { rideId } = validation.data;
 
     // Fetch the ride to verify ownership and status
     const ride = await withRetry(() => prisma.ride.findUnique({ where: { id: rideId } }));

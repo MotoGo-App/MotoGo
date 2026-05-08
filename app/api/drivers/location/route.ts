@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
+import { locationDriverSchema } from './schema';
+import { validateBody } from '@/lib/http';
 
 // GET: Fetch a driver's current location by driverId (query param)
 export async function GET(request: NextRequest) {
@@ -62,7 +64,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { latitude, longitude, accuracy, speed, heading } = await request.json();
+    const validation = await validateBody(request, locationDriverSchema);
+    if (!validation.ok) return validation.response;
+    const { latitude, longitude, accuracy, speed, heading } = validation.data;
 
     const location = await withRetry(async () => {
       const driver = await prisma.driver.findUnique({

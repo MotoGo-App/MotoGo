@@ -2,15 +2,15 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma, withRetry } from '@/lib/db';
+import { forgotPasswordSchema } from './schema';
 import crypto from 'crypto';
+import { validateBody } from '@/lib/http';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json();
-
-    if (!email) {
-      return NextResponse.json({ message: 'Email requerido' }, { status: 400 });
-    }
+    const validation = await validateBody(request, forgotPasswordSchema);
+    if (!validation.ok) return validation.response;
+    const { email } = validation.data;
 
     // Find user by email
     const user = await withRetry(async () => {
