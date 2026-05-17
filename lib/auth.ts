@@ -24,10 +24,8 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Invalid credentials');
         }
 
-        // Identificador para el rate limit (email)
         const identifier = credentials.email.toLowerCase();
 
-        // 1. S2.4 - Consultar intentos fallidos recientes (últimos 15 min)
         const recentFailures = await prisma.authAttempt.count({
           where: {
             identifier,
@@ -36,7 +34,6 @@ export const authOptions: NextAuthOptions = {
           },
         });
 
-        // 2. S2.4 - Aplicar retraso progresivo si hay fallos acumulados
         const delay = calculateThrottlingDelay(recentFailures);
         if (delay > 0) {
           await sleep(delay);
@@ -48,9 +45,7 @@ export const authOptions: NextAuthOptions = {
           })
         );
 
-        // 3. Lógica de validación
         if (!user || !user.password) {
-          // Registramos el intento fallido en la DB
           await prisma.authAttempt.create({
             data: { identifier, endpoint: 'login', success: false },
           });
@@ -60,14 +55,12 @@ export const authOptions: NextAuthOptions = {
         const isPasswordValid = await bcryptjs.compare(credentials.password, user.password);
 
         if (!isPasswordValid) {
-          // Registramos el intento fallido en la DB
           await prisma.authAttempt.create({
             data: { identifier, endpoint: 'login', success: false },
           });
           throw new Error('Invalid credentials');
         }
 
-        // 4. Si el login es exitoso, registramos el éxito
         await prisma.authAttempt.create({
           data: { identifier, endpoint: 'login', success: true },
         });

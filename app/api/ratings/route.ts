@@ -4,7 +4,6 @@ import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
 import { validateBody } from '@/lib/http';
 import { ratingSchema } from './schema';
-// S2.4 - Importamos las utilidades de seguridad
 import { calculateThrottlingDelay, sleep } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -19,7 +18,6 @@ export async function POST(request: NextRequest) {
   const userId = session.user.id;
 
   try {
-    // 1. S2.4 - Throttling: Consultar cuántas veces ha calificado este usuario recientemente (últimos 5 min)
     const recentRatingsCount = await prisma.authAttempt.count({
       where: {
         identifier: userId,
@@ -27,8 +25,6 @@ export async function POST(request: NextRequest) {
         createdAt: { gte: new Date(Date.now() - 5 * 60 * 1000) },
       },
     });
-
-    // 2. S2.4 - Aplicar el freno si hay actividad excesiva
     const delay = calculateThrottlingDelay(recentRatingsCount);
     if (delay > 0) {
       await sleep(delay);
@@ -68,7 +64,6 @@ export async function POST(request: NextRequest) {
       })
     );
 
-    // 3. S2.4 - Registro de éxito en la auditoría
     await prisma.authAttempt.create({
       data: { identifier: userId, endpoint: 'rating', success: true },
     });
@@ -108,7 +103,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating rating:', error);
 
-    // S2.4 - Registro de fallo en la auditoría
     await prisma.authAttempt.create({
       data: { identifier: userId, endpoint: 'rating', success: false },
     });

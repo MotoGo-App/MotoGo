@@ -29,8 +29,7 @@ export function formatCurrency(amount: number, currency = 'MXN'): string {
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function calculateThrottlingDelay(attempts: number): number {
-  if (attempts < 3) return 0; // Sin retraso en los primeros 2 fallos
+  if (attempts < 3) return 0;
   const factor = attempts - 2;
-  // Retraso exponencial: 3er fallo = 2s, 4to = 4s, 5to = 8s...
   return Math.pow(2, factor) * 1000;
 }

@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
 
     const identifier = email.toLowerCase().trim();
 
-    // 1. S2.4 - Consultar intentos de registro recientes (últimos 15 min)
     const recentFailures = await prisma.authAttempt.count({
       where: {
         identifier,
@@ -23,7 +22,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // 2. S2.4 - Aplicar retraso progresivo si se detecta actividad sospechosa
     const delay = calculateThrottlingDelay(recentFailures);
     if (delay > 0) {
       await sleep(delay);
@@ -36,7 +34,6 @@ export async function POST(request: NextRequest) {
     );
 
     if (existingUser) {
-      // S2.4 - Registramos el intento fallido porque el usuario ya existe
       await prisma.authAttempt.create({
         data: { identifier, endpoint: 'signup', success: false },
       });
@@ -68,6 +65,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
+      // Create a free active subscription for the driver
       await prisma.subscription.create({
         data: {
           driverId: driver.id,
@@ -90,7 +88,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 3. S2.4 - Registro de éxito en la creación de cuenta
     await prisma.authAttempt.create({
       data: { identifier, endpoint: 'signup', success: true },
     });
@@ -98,7 +95,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Usuario creado exitosamente' }, { status: 201 });
   } catch (error) {
     console.error('Signup error:', error);
-    // S2.4 - Registro de error técnico como intento fallido
     const { email } = await request
       .clone()
       .json()
