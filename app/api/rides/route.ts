@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, withRetry } from '@/lib/db';
-import { calculateDistance } from '@/lib/utils';
+import { calculateHaversineDistance } from '@/lib/geo';
 import { ridesSchema } from './schema';
 import { validateBody } from '@/lib/http';
 
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
           },
           data: { status: 'REQUESTED' },
         })
-      ).catch(() => {}); // non-critical, don't fail the request
+      ).catch(() => {});
 
       rides = await withRetry(() =>
         prisma.ride.findMany({
@@ -59,7 +59,6 @@ export async function GET(request: NextRequest) {
         })
       );
     } else if (user?.role === 'DRIVER') {
-      // Obtener ubicación actual del conductor
       const driverLocation = await withRetry(() =>
         prisma.driverLocation.findFirst({
           where: {
@@ -68,7 +67,6 @@ export async function GET(request: NextRequest) {
         })
       );
 
-      // Viajes asignados al conductor (sin filtro de distancia)
       const myRides = await withRetry(() =>
         prisma.ride.findMany({
           where: { driverId: session.user!.id },
@@ -83,7 +81,6 @@ export async function GET(request: NextRequest) {
         })
       );
 
-      // Viajes REQUESTED sin conductor — filtrar por radio de 10km
       const MAX_RADIUS_KM = 10;
       let availableRides: typeof myRides = [];
 
@@ -107,10 +104,9 @@ export async function GET(request: NextRequest) {
           })
         );
 
-        // Filtrar por distancia usando Haversine
         availableRides = requestedRides.filter((ride) => {
           if (!ride.originLatitude || !ride.originLongitude) return false;
-          const dist = calculateDistance(
+          const dist = calculateHaversineDistance(
             driverLocation.latitude,
             driverLocation.longitude,
             ride.originLatitude,
@@ -120,7 +116,6 @@ export async function GET(request: NextRequest) {
         });
       }
 
-      // Combinar: viajes del conductor + viajes cercanos disponibles
       rides = [...myRides, ...availableRides];
     } else if (user?.role === 'ADMIN') {
       rides = await withRetry(() =>
@@ -163,16 +158,13 @@ export async function POST(request: NextRequest) {
       destinationLongitude,
     } = validation.data;
 
-    // Calcular distancia solo para estimar la duración del viaje
-    // No se calcula tarifa: el conductor acuerda el precio con el cliente en persona
-    const distance = calculateDistance(
+    const distance = calculateHaversineDistance(
       originLatitude,
       originLongitude,
       destinationLatitude,
       destinationLongitude
     );
 
-    // Crear viaje sin asignar conductor automáticamente
     const ride = await withRetry(() =>
       prisma.ride.create({
         data: {
