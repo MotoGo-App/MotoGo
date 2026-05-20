@@ -22,6 +22,8 @@ export async function GET(request: NextRequest) {
       })
     );
 
+    const { searchParams } = new URL(request.url);
+
     let rides;
 
     if (user?.role === 'CLIENT') {
@@ -123,18 +125,37 @@ export async function GET(request: NextRequest) {
       // Combinar: viajes del conductor + viajes cercanos disponibles
       rides = [...myRides, ...availableRides];
     } else if (user?.role === 'ADMIN') {
-      rides = await withRetry(() =>
-        prisma.ride.findMany({
-          include: {
-            client: true,
-            driver: true,
-            payment: true,
-            ratings: true,
-          },
-          orderBy: { createdAt: 'desc' },
-          take: 100,
-        })
-      );
+      const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+      const limit = Math.max(1, parseInt(searchParams.get('limit') || '10'));
+      const skip = (page - 1) * limit;
+      const [totalItems, adminRides] = await Promise.all([
+        withRetry(() => prisma.ride.count()),
+        withRetry(() =>
+          prisma.ride.findMany({
+            include: {
+              client: true,
+              driver: true,
+              payment: true,
+              ratings: true,
+            },
+            orderBy: { createdAt: 'desc' },
+            skip,
+            take: limit,
+          })
+        ),
+      ]);
+
+      const totalPages = Math.ceil(totalItems / limit);
+
+      return NextResponse.json({
+        data: adminRides,
+        meta: {
+          totalItems,
+          totalPages,
+          currentPage: page,
+          limit,
+        },
+      });
     }
 
     return NextResponse.json(rides ?? []);
